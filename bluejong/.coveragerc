@@ -1,0 +1,3 @@
+[run]
+source = bluejong
+omit = bluejong/test*
