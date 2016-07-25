@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
+import { SheetComponent } from './sheet/sheet.component';
 
 @Component({
     selector: 'my-app',
-    template: '<h1>Hello word!</h1>'
+    template: 'dsezaezae<sheet></sheet>',
+    directives : [SheetComponent]
+
 })
 export class AppComponent { }
