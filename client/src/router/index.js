@@ -9,5 +9,6 @@ export default new Router({
   routes: [
     { path: '/game/:id', name: 'Game', component: Game },
     { path: '/home', name: 'Home', component: Home },
+    { path: '/', name: 'Home', component: Home },
   ],
 });
