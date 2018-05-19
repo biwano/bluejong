@@ -14,13 +14,16 @@
 
     </span>
     <!-- Read Mode -->
-    <div :hidden="mode!=='read'" class="uk-text-nowrap">
-          <span v-if="player!==undefined" class="uk-display-inline-block"> {{ player.name }}</span>
-            <a  class="uk-icon-flip uk-display-inline-block"
-                uk-icon="icon: pencil"
-                v-on:click="editMode()">
-            </a>
-
+    <div :hidden="mode!=='read'" class="uk-text-nowrap" v-on:click="editMode()">
+      <span class="uk-display-inline-block">
+          <span v-if="player !== undefined">{{ player.name }}</span>
+          <span v-if="player === undefined">{{ L.select_player }}</span>
+        </span>
+        <a  v-if="player === undefined"
+            class="uk-icon-flip uk-display-inline-block"
+            uk-icon="icon: pencil"
+            >
+        </a>
     </div>
   </div>
 </template>

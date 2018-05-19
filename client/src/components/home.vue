@@ -1,5 +1,5 @@
 <template>
-  <div class="uk-child-width-1-3@m uk-grid-small uk-grid-match" uk-grid>
+    <div class="uk-child-width-1-3@m uk-grid-small uk-grid-match" uk-grid>
     <div>
         <div class="uk-card uk-card-default uk-card-body">
             <h3 class="uk-card-title">{{ L.new_game }}</h3>
@@ -18,6 +18,7 @@ export default {
   mixins: [GameMixin],
   data() {
     return {
+      loading: false,
     };
   },
   created() {
@@ -27,7 +28,8 @@ export default {
     newGame(gameType) {
       this.gameService.create(gameType).then((response) => {
         this.$router.push({ name: 'Game', params: { id: response.data._id } });
-      });
+        this.loading = false;
+      }).catch(error => this.loading = false);
     },
   },
 };

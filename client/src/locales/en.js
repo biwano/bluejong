@@ -4,6 +4,7 @@ export default {
   my_games: 'My games',
   unexpected_error: 'An unexpected error occured',
   players: 'Players',
+  select_player: 'Select player',
   date: 'Date',
   actions: 'Actions',
   winner: 'Winner',
@@ -16,5 +17,4 @@ export default {
   new_game: 'New game',
   game_not_found: 'Game not found',
   MCR: 'MCR',
-  select_player: 'Select player',
 };

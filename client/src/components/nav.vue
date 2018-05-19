@@ -26,7 +26,7 @@
 
           <ul class="uk-navbar-nav">
               <li>
-                  <a href="#/home">
+                  <a>
                     <span class="uk-icon-flip uk-display-inline-block"
                       uk-icon="icon: menu; ratio: 2">
                     </span>

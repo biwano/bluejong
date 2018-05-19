@@ -1,6 +1,6 @@
 <template>
   <div>
-
+    <div v-if="!loaded" uk-spinner="ratio: 3"></div>
     <table v-if="loaded" class="uk-table">
       <!-- Header -->
       <thead>
