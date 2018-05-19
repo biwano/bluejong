@@ -1,5 +1,11 @@
 export default {
+  home: 'Home',
+  bluejong: 'Bluejong',
+  my_games: 'My games',
   unexpected_error: 'An unexpected error occured',
+  players: 'Players',
+  date: 'Date',
+  actions: 'Actions',
   winner: 'Winner',
   wind: 'Wind',
   picked_on: 'Picked on',

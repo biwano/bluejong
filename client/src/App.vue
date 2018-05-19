@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <navigation></navigation>
     <messages :messages="$store.state.message.messages"></messages>
     <router-view/>
   </div>
@@ -7,10 +8,11 @@
 
 <script>
 import Messages from '@/framework/components/messages';
+import Nav from '@/components/nav';
 
 export default {
   name: 'App',
-  components: { messages: Messages },
+  components: { navigation: Nav, messages: Messages },
 };
 </script>
 
@@ -19,7 +21,6 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 </style>

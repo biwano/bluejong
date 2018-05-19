@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
+const helpers = require('./modelHelpers');
 
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const schema = mongoose.Schema({
   ownerId: { type: ObjectId, ref: 'User' },
+  created: Date,
+  updated: Date,
   rules: String,
   playerSlots: [{ index: Number, player: { type: ObjectId, ref: 'Player' } }],
   roundSlots: [{ index: Number,
@@ -19,6 +22,7 @@ const schema = mongoose.Schema({
 });
 // Packing players before save
 schema.pre('save', function presave(next) {
+  helpers.preSave(this);
   for (let i = 0; i < this.playerSlots.length; i += 1) {
     const slot = this.playerSlots[i];
     if (slot.player !== undefined && slot.player._id !== undefined) {

@@ -41,5 +41,37 @@ router.get('/:id', async (req, res) => {
     res.json(res.sendResponse('game_error'));
   }
 });
+// Delete game
+router.delete('/:id', async (req, res) => {
+  try {
+    const game = await res.M.Game.findOne({ ownerId: req.user._id, _id: req.params.id })
+      .populate('playerSlots.player').exec();
+    if (game === null) res.sendResponse('game_not_found');
+    else {
+      game.status = 'deleted';
+      game.save();
+      res.sendResponse();
+    }
+  } catch (err) {
+    console.log(err);
+    res.json(res.sendResponse('game_error'));
+  }
+});
+// Get all active games
+router.get('/', async (req, res) => {
+  try {
+    const games = await res.M.Game.find({
+      ownerId: req.user._id,
+      status: { $ne: 'deleted' } })
+      .limit(10)
+      .sort({ created: -1 })
+      .populate('playerSlots.player')
+      .exec();
+    res.json(games);
+  } catch (err) {
+    console.log(err);
+    res.json(res.sendResponse('game_error'));
+  }
+});
 
 module.exports = router;

@@ -10,7 +10,9 @@ function createRouter(connection) {
     secret: 'the secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { secure: false,
+      expires: new Date(2030, 1, 1),
+    },
     store: new MongoStore({ mongooseConnection: connection }),
     collection: 'session',
   }));

@@ -10,6 +10,7 @@ import createStore from '@/store/store';
 import App from './App';
 import Suggestion from './framework/components/suggestion';
 import router from './router';
+import moment from 'moment';
 
 // loads the Icon plugin
 UIkit.use(Icons);
@@ -18,6 +19,12 @@ Vue.config.productionTip = false;
 Vue.use(Vuex);
 const store = createStore();
 
+
+Vue.filter('formatDate', (value) => {
+  if (value) {
+    return moment(String(value)).format('DD MMM YYYY hh:mm');
+  }
+});
 // Injecting locales
 Vue.mixin(locales);
 
