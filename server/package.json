@@ -1,0 +1,36 @@
+{
+  "name": "mahjongsheet-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/biwano/mahjongsheet.git"
+  },
+  "keywords": [
+    "mahjong"
+  ],
+  "author": "Bruno Ilponse",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/biwano/mahjongsheet/issues"
+  },
+  "homepage": "https://github.com/biwano/mahjongsheet#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "connect-mongo": "^2.0.1",
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "mongoose": "^5.0.17"
+  },
+  "devDependencies": {
+    "eslint": "^4.15.0",
+    "eslint-config-airbnb-base": "^11.3.0",
+    "eslint-plugin-import": "^2.11.0"
+  }
+}
