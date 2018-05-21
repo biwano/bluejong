@@ -3,7 +3,7 @@ export default {
   methods: {
     classActive(url) {
       const active = this.$route.path.startsWith(url);
-	  return { 'uk-active': active };
+      return { 'uk-active': active };
     },
   },
 };

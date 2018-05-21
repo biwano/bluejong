@@ -1,7 +1,8 @@
+// Adds a messsage to a message list
 const message = function message(messages, type, text) {
   messages.push({ type, text });
 };
-// Locales object
+// Messae store
 const messagesStore = {
   namespaced: true,
   state: {

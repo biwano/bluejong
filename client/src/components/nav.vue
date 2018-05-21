@@ -25,7 +25,11 @@
                 <icon icon="menu" :size="2"></icon>
                 <div class="uk-navbar-dropdown">
                     <ul class="uk-nav uk-navbar-dropdown-nav">
-                        <li :class="classActive('/games')"><a href="#/games">{{ L.my_games }}</a></li>
+                        <li class="uk-nav-header">{{ name }}</li>
+                        <li class="uk-nav-divider"></li>
+                        <li :class="classActive('/games')">
+                          <a href="#/games">{{ L.my_games }}</a>
+                        </li>
                     </ul>
                 </div>
               </li>
@@ -44,10 +48,12 @@ export default {
     return {
     };
   },
-  created() {
-  },
-  methods: {
-
+  computed: {
+    name() {
+      const type = this.$store.getters['auth/type'];
+      const name = this.$store.getters['auth/name'];
+      return type === 'guest' ? this.L.guest : name;
+    },
   },
 };
 </script>

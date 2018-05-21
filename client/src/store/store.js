@@ -1,12 +1,10 @@
 import Vuex from 'vuex';
 import MessageStore from '@/framework/store/messageStore';
+import AuthStore from '@/framework/store/authStore';
 
 
 const createStore = function store() {
   return new Vuex.Store({
-    state: {
-      count: 0,
-    },
     mutations: {
       increment(state) {
         state.count += 1;
@@ -14,6 +12,7 @@ const createStore = function store() {
     },
     modules: {
       message: MessageStore,
+      auth: AuthStore,
     },
   });
 };

@@ -1,6 +1,7 @@
 export default {
   home: 'Home',
   bluejong: 'Bluejong',
+  guest: 'Guest',
   my_games: 'My games',
   unexpected_error: 'An unexpected error occured',
   players: 'Players',
@@ -24,5 +25,6 @@ export default {
   choose: 'Please choose',
   new_game: 'New game',
   game_not_found: 'Game not found',
+  no_games: 'No games found',
   MCR: 'MCR',
 };

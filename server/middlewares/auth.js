@@ -22,7 +22,12 @@ function createRouter(connection) {
     try {
       if (!req.session.user) {
         // Creating user in database
-        req.session.user = await res.M.User().save();
+        let newUser = {
+          type: 'guest',
+          name: 'Guest',
+        };
+        newUser = await res.M.User(newUser).save();
+        req.session.user = newUser;
       }
       // Injecting
       req.user = req.session.user;

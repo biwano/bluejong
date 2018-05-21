@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <table v-if="loaded" class="uk-table  uk-table-divider uk-table-hover uk-table-middle ">
+    <table v-if="games.length>0" class="uk-table  uk-table-divider uk-table-hover uk-table-middle ">
       <!-- Header -->
       <thead>
        <tr>
@@ -31,6 +31,9 @@
         </tr>
       </tbody>
     </table>
+    <div v-if="loaded && games.length===0" class="uk-alert-primary uk-text-center" uk-alert>
+      <h3>{{ L.no_games }}</h3>
+    </div>
   </div>
 </template>
 
