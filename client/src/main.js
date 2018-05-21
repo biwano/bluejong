@@ -7,9 +7,11 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import moment from 'moment';
 import locales from '@/framework/mixins/localesMixin';
+import nav from '@/framework/mixins/navMixin';
 import createStore from '@/store/store';
 import App from './App';
 import Suggestion from './framework/components/suggestion';
+import Icon from './framework/components/icon';
 import router from './router';
 
 // loads the Icon plugin
@@ -23,9 +25,11 @@ const store = createStore();
 Vue.filter('formatDate', value => (value ? moment(String(value)).format('DD MMM YYYY hh:mm') : undefined));
 // Injecting locales
 Vue.mixin(locales);
+Vue.mixin(nav);
 
 // Importing components globally
 Vue.component('suggestion', Suggestion);
+Vue.component('icon', Icon);
 
 /* eslint-disable no-new */
 new Vue({

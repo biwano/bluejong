@@ -20,7 +20,7 @@
     </div>
     <a v-if="query !==''"
         class="uk-form-icon-flip uk-display-inline-block"
-        uk-icon="icon: plus-circle; ratio: 2"
+        uk-icon="icon: plus-circle; ratio: 1.5"
         @click="emitCreate()"
         @mouseover="createlock=true;"
         @mouseleave="createlock=false;dropdownOff();">

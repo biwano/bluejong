@@ -5,9 +5,9 @@ const config = require('./config.js');
 const persistence = require('./middlewares/persistence.js');
 const auth = require('./middlewares/auth.js');
 const helpers = require('./middlewares/helpers.js');
-const admin = require('./routes/admin.js');
-const player = require('./routes/player.js');
-const game = require('./routes/game.js');
+const admin = require('./routes/adminRoute.js');
+const player = require('./routes/playerRoute.js');
+const game = require('./routes/gameRoute.js');
 
 const app = express();
 

@@ -25,16 +25,8 @@
             </span>
           </td>
           <td>
-            <a  class="uk-icon-flip uk-display-inline-block"
-                uk-icon="icon: pencil"
-                :href="`#/game/${game._id}`">
-            </a>
-            <a  class="uk-icon-flip uk-display-inline-block"
-                uk-icon="icon: trash"
-                @click="deleteGame(game._id)"
-                >
-            </a>
-
+            <icon icon="pencil" :url="`#/game/${game._id}`"></icon>
+            <icon icon="trash" @click="deleteGame(game._id)" :confirm-click="true"></icon>
           </td>
         </tr>
       </tbody>

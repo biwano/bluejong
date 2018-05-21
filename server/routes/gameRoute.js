@@ -10,7 +10,7 @@ router.put('/', async (req, res) => {
     game = await game.save();
     res.json(game);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.json(res.sendResponse('game_error'));
   }
 });
@@ -24,7 +24,7 @@ router.post('/:id', async (req, res) => {
     game = await game.save();
     res.json(game);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.json(res.sendResponse('game_error'));
   }
 });
@@ -37,7 +37,7 @@ router.get('/:id', async (req, res) => {
     if (game === null) res.sendResponse('game_not_found');
     else res.json(game);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.json(res.sendResponse('game_error'));
   }
 });

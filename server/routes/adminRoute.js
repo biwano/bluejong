@@ -6,7 +6,7 @@ const initData = async (M) => {
   try {
     await M.Player.remove({});
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return false;
   }
   return true;

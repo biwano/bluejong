@@ -7,12 +7,8 @@
       <div class="uk-navbar-left">
 
           <ul class="uk-navbar-nav">
-              <li class="uk-active">
-                <a href="#/home">
-                  <span class="uk-icon-flip uk-display-inline-block"
-                    uk-icon="icon: home; ratio: 2">
-                  </span>
-                </a>
+              <li :class="classActive('/home')">
+                <icon url="#/home" icon="home" :size="2"></icon>
               </li>
           </ul>
 
@@ -26,16 +22,12 @@
 
           <ul class="uk-navbar-nav">
               <li>
-                  <a>
-                    <span class="uk-icon-flip uk-display-inline-block"
-                      uk-icon="icon: menu; ratio: 2">
-                    </span>
-                  </a>
-                  <div class="uk-navbar-dropdown">
-                      <ul class="uk-nav uk-navbar-dropdown-nav">
-                          <li class="uk-active"><a href="#/games">{{ L.my_games }}</a></li>
-                      </ul>
-                  </div>
+                <icon icon="menu" :size="2"></icon>
+                <div class="uk-navbar-dropdown">
+                    <ul class="uk-nav uk-navbar-dropdown-nav">
+                        <li :class="classActive('/games')"><a href="#/games">{{ L.my_games }}</a></li>
+                    </ul>
+                </div>
               </li>
           </ul>
       </div>
@@ -48,7 +40,6 @@
 
 export default {
   name: 'Nav',
-  mixins: [],
   data() {
     return {
     };
@@ -56,6 +47,7 @@ export default {
   created() {
   },
   methods: {
+
   },
 };
 </script>
