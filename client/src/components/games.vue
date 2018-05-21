@@ -10,6 +10,7 @@
           <th>{{ L.actions }}</th>
         </tr>
       </thead>
+      <!-- games list -->
       <tbody>
         <tr v-for="game in games" :key="game._id">
           <td>{{ game.created | formatDate}}</td>

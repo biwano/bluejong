@@ -5,35 +5,67 @@
       <!-- Header -->
       <thead>
         <tr>
-          <th colspan="4" v-if="ready"></th>
-          <th></th>
-        </tr>
-        <tr>
-          <th class="uk-text-center">{{ L.wind }}</th>
-          <th class="uk-text-center">{{ L.winner }}</th>
-          <th class="uk-text-center">{{ L.picked_on }}</th>
-          <th class="uk-text-center">{{ L.points }}</th>
+          <th class="uk-text-center" v-if="ready">{{ L.wind }}</th>
+          <th class="uk-text-center" v-if="ready">{{ L.winner }}</th>
+          <th class="uk-text-center" v-if="ready">{{ L.picked_on }}</th>
+          <th class="uk-text-center" v-if="ready">{{ L.points }}</th>
           <th v-for="playerSlot in playerSlots" :key="playerSlot.index">
             <game-player-chooser
               v-model="playerSlot.player"
               @input="playerUpdated(playerSlot)"
               :suggestionFilter="playerSuggestionFilter"
+              :placeholder="playerChooserPlaceholder(playerSlot)"
               :ref="`chooser${playerSlot.index}`">
             </game-player-chooser>
           </th>
         </tr>
       </thead>
       <!-- Rounds -->
-      <game-round v-for="roundSlot in roundSlots" :key="roundSlot.index"
-        :visible="ready"
-        :playerSlots="playerSlots"
-        :round="roundSlot.round" v-on:update:round="roundUpdated(roundSlot, $event)"
-        v-on:validated="roundValidated(roundSlot, $event)"
-        :ref="`round${roundSlot.index}`"
-        :rules="rules">
-      </game-round>
+      <tbody>
+        <game-round v-for="roundSlot in roundSlots" :key="roundSlot.index"
+          :playerSlots="playerSlots"
+          :round="roundSlot.round" v-on:update:round="roundUpdated(roundSlot, $event)"
+          @validated="roundValidated(roundSlot, $event)"
+          :ref="`round${roundSlot.index}`"
+          :rules="rules">
+        </game-round>
+      </tbody>
+      <!-- Penalty lines -->
+      <tbody :hidden="penaltySlots.length===0">
+        <tr>
+          <th></th>
+          <th class="uk-text-center" colspan="2">{{ L.offender }}</th>
+          <th class="uk-text-center">{{ L.penalty }}</th>
+          <th v-for="playerSlot in playerSlots" :key="playerSlot.index">
+            <span v-if="playerSlot.player">{{ playerSlot.player.name }}</span>
+          </th>
+        </tr>
+        <penalty-line v-for="penaltySlot in penaltySlots" :key="penaltySlot.index"
+          :playerSlots="playerSlots"
+          :penaltyLine="penaltySlot.penaltyLine"
+          @update:penaltyLine="penaltyLineUpdated(penaltySlot, $event)"
+          :ref="`penaltyLine${penaltySlot.index}`"
+          :rules="rules">
+        </penalty-line>
+      </tbody>
+      <!-- Add Penalty -->
+      <tbody v-if="penaltyReady">
+        <tr>
+          <th colspan="8">
+            <button class="uk-button uk-button-primary" @click="addPenalty()">
+              {{ L.add_penalty }}
+            </button>
+          </th>
+        </tr>
+      </tbody>
       <!-- Totals -->
       <tbody v-if="ready">
+        <tr>
+          <th colspan="4"></th>
+          <th v-for="playerSlot in playerSlots" :key="playerSlot.index">
+            <span v-if="playerSlot.player">{{ playerSlot.player.name }}</span>
+          </th>
+        </tr>
         <tr>
           <th colspan="4" class="uk-text-right">{{ L.totals }}</th>
           <td v-for="playerSlot in playerSlots"
@@ -57,6 +89,7 @@
 
 <script>
 import GameRound from '@/components/gameRound';
+import PenaltyLine from '@/components/penaltyLine';
 import GamePlayerChooser from '@/components/gamePlayerChooser';
 import rulesSets from '@/business/rulesSets';
 import GameMixin from '@/mixins/gameMixin';
@@ -71,12 +104,13 @@ export default {
   data() {
     return {
       // Players
-      playerSlots: [{ index: 0, player: { _id: 'epozr', name: 'temp' } },
+      playerSlots: [{ index: 0, player: undefined },
         { index: 1, player: undefined },
         { index: 2, player: undefined },
         { index: 3, player: undefined }],
       // Rounds
       roundSlots: [],
+      penaltySlots: [],
       // Table point distribution
       rules: rulesSets.mcr,
       loaded: false,
@@ -115,6 +149,8 @@ export default {
           }
           // Unpacking Rounds
           this.roundSlots = game.roundSlots;
+          // Unpacking Rounds
+          this.penaltySlots = game.penaltySlots;
           this.loaded = true;
         }
       }).catch(() => this.messagesService.error('unexpected_error'));
@@ -125,6 +161,7 @@ export default {
         this.gameService.save(this.game_id, {
           roundSlots: this.roundSlots,
           playerSlots: this.playerSlots,
+          penaltySlots: this.penaltySlots,
           totals: this.totals,
           tablePoints: this.tablePoints,
           status: this.status,
@@ -132,15 +169,21 @@ export default {
       });
     },
     // A round is updated, a new round is created if this one is valid
-    roundUpdated(roundSlot_, $event) {
+    roundUpdated(roundSlot_, round) {
       const roundSlot = roundSlot_;
-      roundSlot.round = $event;
+      roundSlot.round = round;
       if (this.isLastRoundSlot(roundSlot) && this.rules.isValid(roundSlot.round)) {
         const nextRound = this.rules.nextRoundSlot(roundSlot);
         if (nextRound !== undefined) {
           this.roundSlots.push(nextRound);
         }
       }
+      this.save();
+    },
+    // A penaltyLine is updated
+    penaltyLineUpdated(penaltySlot_, penaltyLine) {
+      const penaltySlot = penaltySlot_;
+      penaltySlot.penaltyLine = penaltyLine;
       this.save();
     },
     // A round is validated (enter pressed => focus next round)
@@ -191,15 +234,23 @@ export default {
     focusRound(roundSlot) {
       this.$nextTick(() => this.$refs[`round${roundSlot.index}`][0].focus());
     },
+    // placeholder for player chooser
+    playerChooserPlaceholder(playerSlot) {
+      return this.L[`select_player_${this.rules.WINDS[playerSlot.index]}`];
+    },
+    // adds a pealty splot
+    addPenalty() {
+      this.penaltySlots.push(this.rules.newPenaltySlot(this.lastPenaltySlot));
+    },
   },
   computed: {
     // Players' totals
     totals() {
-      return this.rules.totals(this.playerSlots, this.roundSlots);
+      return this.rules.totals(this.playerSlots, this.roundSlots, this.penaltySlots);
     },
     // Players' table points
     tablePoints() {
-      return this.rules.tablePoints(this.playerSlots, this.roundSlots);
+      return this.rules.tablePoints(this.playerSlots, this.roundSlots, this.penaltySlots);
     },
     // game ready if all players are filled
     ready() {
@@ -209,6 +260,15 @@ export default {
       }
       return ready;
     },
+    // Last PenaltySlot
+    lastPenaltySlot() {
+      return this.penaltySlots[this.penaltySlots.length - 1];
+    },
+    // Can we add a new penalty
+    penaltyReady() {
+      return this.ready && (this.penaltySlots.length === 0 ||
+        this.rules.isPenaltyLineValid(this.lastPenaltySlot.penaltyLine));
+    },
     // game is finished?
     status() {
       return this.rules.isFinished(this.roundSlots) ? 'ongoing' : 'finished';
@@ -216,6 +276,7 @@ export default {
   },
   components: {
     'game-round': GameRound,
+    'penalty-line': PenaltyLine,
     'game-player-chooser': GamePlayerChooser,
   },
 };

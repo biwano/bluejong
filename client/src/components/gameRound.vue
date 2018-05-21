@@ -1,62 +1,61 @@
 <template>
-  <tbody :hidden="!visible">
-    <tr>
-      <!-- Wind -->
-      <th>
-        <img :src="windURL"/>
-      </th>
-      <!-- Winner -->
-      <th>
-        <select class="uk-select"
-          v-model.number="winnerIndex"
-          ref="winner"
-          @input="focus()">
-          <option value="-1">{{ L.choose }}</option>
-          <option v-for="playerSlot in playerSlots"
-            :key="playerSlot.index"
-            :value="playerSlot.index">
-            <span>{{ playerName(playerSlot)}}</span>
-          </option>
-        </select>
-      </th>
-      <!-- Picked on -->
-      <th>
-        <select class="uk-select"
-          v-model.number="pickedOnIndex"
-          ref="pickedOn"
-          @input="focus()">
-          <option value="-1">{{ L.choose }}</option>
-          <option v-for="playerSlot in playerSlots"
-            :key="playerSlot.index"
-            :value="playerSlot.index">
+  <tr>
+    <!-- Wind -->
+    <th>
+      <img :src="windURL"/>
+    </th>
+    <!-- Winner -->
+    <th>
+      <select class="uk-select"
+        v-model.number="winnerIndex"
+        ref="winner"
+        @input="focus()">
+        <option :value="this.rules.PLAYER_NOT_CHOSEN">{{ L.choose }}</option>
+        <option v-for="playerSlot in playerSlots"
+          :key="playerSlot.index"
+          :value="playerSlot.index">
+          <span>{{ playerName(playerSlot)}}</span>
+        </option>
+        <option :value="this.rules.ROUND_DRAW">{{ L.draw }}</option>
+      </select>
+    </th>
+    <!-- Picked on -->
+    <th>
+      <select class="uk-select"
+        v-model.number="pickedOnIndex"
+        ref="pickedOn"
+        :hidden="!hasWinner"
+        @click="focus()">
+        <option :value="this.rules.PLAYER_NOT_CHOSEN">{{ L.choose }}</option>
+        <option v-for="playerSlot in playerSlots"
+          :key="playerSlot.index"
+          :value="playerSlot.index">
 
-            {{ pickedOnName(playerSlot) }}
-          </option>
-        </select>
-      </th>
-      <!-- Score -->
-      <th><input class="uk-input points"
-        type="number"
-        v-model.number="score"
-        ref="score"
-        @keyup.enter="$emit('validated', round)"/>
-      </th>
-      <!-- Player points -->
-      <td v-for="playerSlot in playerSlots" :key="playerSlot.index"  v-if="rules.isValid(newData)"
-        :class="{ 'uk-alert-success': rules.isWinner(newData, playerSlot.index),
-        'uk-alert-danger': rules.isPickedOn(newData, playerSlot.index) }">
-        {{ newData.points[playerSlot.index] }}
-      </td>
-    </tr>
-  </tbody>
-
-
+          {{ pickedOnName(playerSlot) }}
+        </option>
+      </select>
+    </th>
+    <!-- Score -->
+    <th><input class="uk-input points"
+      type="number"
+      v-model.number="score"
+      ref="score"
+      :hidden="!hasWinner"
+      @keyup.enter="$emit('validated', round)"/>
+    </th>
+    <!-- Player points -->
+    <td v-for="playerSlot in playerSlots" :key="playerSlot.index"  v-if="rules.isValid(newData)"
+      :class="{ 'uk-alert-success': rules.isWinner(newData, playerSlot.index),
+      'uk-alert-danger': rules.isPickedOn(newData, playerSlot.index) }">
+      {{ newData.points[playerSlot.index] }}
+    </td>
+  </tr>
 </template>
 
 <script>
 export default {
   name: 'GameRound',
-  props: ['playerSlots', 'round', 'visible', 'rules'],
+  props: ['playerSlots', 'round', 'rules'],
   data() {
     return {
       winnerIndex: this.round.winnerIndex,
@@ -75,8 +74,6 @@ export default {
         pickedOnIndex: this.pickedOnIndex,
         score: this.score,
         points: new Array(this.playerSlots.length),
-        // points: {},
-        // totalPoints: {},
       };
       newData.valid = this.rules.isValid(newData);
 
@@ -89,8 +86,8 @@ export default {
     },
     focus() {
       this.$nextTick(() => {
-        if (this.winnerIndex === -1) this.$refs.winner.focus();
-        else if (this.pickedOnIndex === -1) this.$refs.pickedOn.focus();
+        if (this.winnerIndex === this.rules.PLAYER_NOT_CHOSEN) this.$refs.winner.focus();
+        else if (this.pickedOnIndex === this.rules.PLAYER_NOT_CHOSEN) this.$refs.pickedOn.focus();
         else this.$refs.score.focus();
       });
     },
@@ -106,11 +103,10 @@ export default {
       return this.compute();
     },
     windURL() {
-      const file = { E: 'east.png',
-        W: 'west.png',
-        N: 'north.png',
-        S: 'south.png' }[this.round.wind];
-      return `../static/img/${file}`;
+      return `../static/img/${this.round.wind}.png`;
+    },
+    hasWinner() {
+      return this.winnerIndex >= 0;
     },
   },
 };

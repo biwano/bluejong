@@ -1,9 +1,10 @@
 <template>
   <div>
     <input class="uk-input" type="text" v-model="query"
-      v-on:input="queryUpdated($event.target.value)"
-      v-on:focus="dropdown=true;inputlock=true;"
-      v-on:blur="inputlock=false;dropdownOff()"
+      @input="queryUpdated($event.target.value)"
+      @focus="dropdown=true;inputlock=true;"
+      @blur="inputlock=false;dropdownOff()"
+      @keyup.enter="emitCreate()"
       :placeholder="placeholder"
       ref="input"/>
     <div :class="{ 'uk-dropdown':true, 'uk-open': (dropdown && suggestions.length>0) }"
@@ -20,9 +21,9 @@
     <a v-if="query !==''"
         class="uk-form-icon-flip uk-display-inline-block"
         uk-icon="icon: plus-circle; ratio: 2"
-        v-on:click="$emit('create', query)"
-        v-on:mouseover="createlock=true;"
-        v-on:mouseleave="createlock=false;dropdownOff();">
+        @click="emitCreate()"
+        @mouseover="createlock=true;"
+        @mouseleave="createlock=false;dropdownOff();">
     </a>
   </div >
 </template>
@@ -64,6 +65,11 @@ export default {
     },
     focus() {
       this.$nextTick(() => this.$refs.input.focus());
+    },
+    emitCreate() {
+      if (this.query.length > 0) {
+        this.$emit('create', this.query);
+      }
     },
   },
 };

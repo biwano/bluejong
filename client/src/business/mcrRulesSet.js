@@ -1,25 +1,25 @@
 const mcrRulesSet = {
   name: 'mcr',
-  minMahjongScore: 8,
+  MIN_MAHJONG_SCORE: 8,
   // Creates a round
   nextRoundSlot(previousRoundSlot) {
     let index;
     let wind;
     const score = 0;
-    const winnerIndex = -1;
+    const winnerIndex = this.PLAYER_NOT_CHOSEN;
     const pickedOnIndex = -1;
 
     // First roundData
     if (previousRoundSlot === undefined) {
       index = 0;
-      wind = this.winds[0];
+      wind = this.WINDS[0];
     } else {
     // Next Rounds
       index = previousRoundSlot.index + 1;
       if (index >= 16) return undefined;
-      let windIndex = this.winds.indexOf(previousRoundSlot.round.wind);
+      let windIndex = this.WINDS.indexOf(previousRoundSlot.round.wind);
       if (index % 4 === 0) windIndex += 1;
-      wind = this.winds[windIndex];
+      wind = this.WINDS[windIndex];
     }
     return { index, round: { wind, score, winnerIndex, pickedOnIndex } };
   },
@@ -28,10 +28,12 @@ const mcrRulesSet = {
     const isPickedOn = this.isPickedOn(round, playerSlotIndex);
     let points = 0;
     if (!this.isValid(round)) points = 0;
+    // Draw
+    else if (this.isDraw(round)) points = 0;
     // Self pick
     else if (this.selfPick(round)) {
       // Winner
-      if (this.isWinner(round, playerSlotIndex)) points = (8 + round.score) * 3;
+      if (isWinner) points = (8 + round.score) * 3;
       // Others
       else points = -(8 + round.score);
     // PickedOn

@@ -16,6 +16,13 @@ const schema = mongoose.Schema({
       score: Number,
       points: [Number],
     } }],
+  penaltySlots: [{ index: Number,
+    penaltyLine: {
+      offenderIndex: Number,
+      penalty: Number,
+      points: [Number],
+    },
+  }],
   totals: [Number],
   tablePoints: [Number],
   status: String,

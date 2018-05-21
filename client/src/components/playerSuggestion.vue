@@ -2,7 +2,7 @@
   <span class="uk-text-nowrap">
     <suggestion v-model="player" v-on:input="playerUpdated($event)"
       :suggestions="suggestions" v-on:update:query="queryUpdated($event)"
-      :placeholder="L.select_player"
+      :placeholder="placeholder"
       :suggestionFilter="suggestionFilter"
       v-on:blur="$emit('blur')"
       v-on:create="createPlayer($event)"
@@ -18,7 +18,7 @@ import PlayerMixin from '@/mixins/playerMixin';
 
 export default {
   name: 'PlayerSuggestion',
-  props: ['value', 'suggestionFilter'],
+  props: ['value', 'suggestionFilter', 'placeholder'],
   mixins: [PlayerMixin],
   data() {
     return { suggestions: [],

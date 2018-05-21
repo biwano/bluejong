@@ -29,7 +29,7 @@ export default {
       this.gameService.create(gameType).then((response) => {
         this.$router.push({ name: 'Game', params: { id: response.data._id } });
         this.loading = false;
-      }).catch(error => this.loading = false);
+      }).catch(() => { this.loading = false; });
     },
   },
 };
