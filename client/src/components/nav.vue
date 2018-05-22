@@ -21,15 +21,17 @@
       <div class="uk-navbar-right">
 
           <ul class="uk-navbar-nav">
+              <li class="uk-nav-muted"><a>{{ name }}</a></li>
               <li>
                 <icon icon="menu" :size="2"></icon>
                 <div class="uk-navbar-dropdown">
                     <ul class="uk-nav uk-navbar-dropdown-nav">
-                        <li class="uk-nav-header">{{ name }}</li>
-                        <li class="uk-nav-divider"></li>
                         <li :class="classActive('/games')">
                           <a href="#/games">{{ L.my_games }}</a>
                         </li>
+                        <li class="uk-nav-divider"></li>
+                        <li class="uk-nav-muted">{{ L.bluejong }} {{ $store.state.version }}</li>
+
                     </ul>
                 </div>
               </li>
