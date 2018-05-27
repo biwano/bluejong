@@ -6,7 +6,6 @@ const schema = mongoose.Schema({
   updated: Date,
   type: String,
   name: String,
-  email: String,
   auth: {
     login: String,
     password: String,

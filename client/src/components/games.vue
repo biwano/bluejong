@@ -65,7 +65,7 @@ export default {
           this.games = response.data;
           this.loaded = true;
         }
-      }).catch(() => this.messagesService.error('unexpected_error'));
+      }).catch(() => this.messagesService.error('error_unexpected'));
     },
     deleteGame(gameId) {
       this.gameService.delete(gameId).then((response) => {
@@ -74,7 +74,7 @@ export default {
         } else {
           this.load();
         }
-      }).catch(() => this.messagesService.error('unexpected_error'));
+      }).catch(() => this.messagesService.error('error_unexpected'));
     },
   },
 };

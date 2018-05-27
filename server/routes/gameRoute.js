@@ -8,10 +8,9 @@ router.put('/', async (req, res) => {
     let game = res.M.Game(req.body);
     game.ownerId = req.user._id;
     game = await game.save();
-    res.json(game);
+    res.sendData(game);
   } catch (err) {
-    console.error(err);
-    res.json(res.sendResponse('game_error'));
+    res.sendException(err);
   }
 });
 
@@ -22,10 +21,9 @@ router.post('/:id', async (req, res) => {
       .populate('playerSlots.player').exec();
     Object.assign(game, req.body);
     game = await game.save();
-    res.json(game);
+    res.sendData(game);
   } catch (err) {
-    console.error(err);
-    res.json(res.sendResponse('game_error'));
+    res.sendException(err);
   }
 });
 
@@ -34,27 +32,24 @@ router.get('/:id', async (req, res) => {
   try {
     const game = await res.M.Game.findOne({ ownerId: req.user._id, _id: req.params.id })
       .populate('playerSlots.player').exec();
-    if (game === null) res.sendResponse('game_not_found');
-    else res.json(game);
+    if (game === null) res.sendError('game_not_found');
+    else res.sendData(game);
   } catch (err) {
-    console.error(err);
-    res.json(res.sendResponse('game_error'));
+    res.sendException(err);
   }
 });
 // Delete game
 router.delete('/:id', async (req, res) => {
   try {
-    const game = await res.M.Game.findOne({ ownerId: req.user._id, _id: req.params.id })
-      .populate('playerSlots.player').exec();
-    if (game === null) res.sendResponse('game_not_found');
+    const game = await res.M.Game.findOne({ ownerId: req.user._id, _id: req.params.id });
+    if (game === null) res.sendError('game_not_found');
     else {
       game.status = 'deleted';
       game.save();
-      res.sendResponse();
+      res.sendSuccess();
     }
   } catch (err) {
-    console.log(err);
-    res.json(res.sendResponse('game_error'));
+    res.sendException(err);
   }
 });
 // Get all active games
@@ -67,10 +62,9 @@ router.get('/', async (req, res) => {
       .sort({ created: -1 })
       .populate('playerSlots.player')
       .exec();
-    res.json(games);
+    res.sendData(games);
   } catch (err) {
-    console.log(err);
-    res.json(res.sendResponse('game_error'));
+    res.sendException(err);
   }
 });
 

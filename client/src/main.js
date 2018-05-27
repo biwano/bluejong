@@ -8,6 +8,7 @@ import Vuex from 'vuex';
 import moment from 'moment';
 import locales from '@/framework/mixins/localesMixin';
 import nav from '@/framework/mixins/navMixin';
+import messages from '@/framework/mixins/messagesMixin';
 import createStore from '@/store/store';
 import App from './App';
 import Suggestion from './framework/components/suggestion';
@@ -21,11 +22,11 @@ Vue.config.productionTip = false;
 Vue.use(Vuex);
 const store = createStore();
 
-
 Vue.filter('formatDate', value => (value ? moment(String(value)).format('DD MMM YYYY hh:mm') : undefined));
-// Injecting locales
+// Injecting mixins
 Vue.mixin(locales);
 Vue.mixin(nav);
+Vue.mixin(messages);
 
 // Importing components globally
 Vue.component('suggestion', Suggestion);

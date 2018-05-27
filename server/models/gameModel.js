@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const helpers = require('./modelHelpers');
+const helpers = require('../helpers/modelHelpers');
 
 const ObjectId = mongoose.Schema.Types.ObjectId;
 

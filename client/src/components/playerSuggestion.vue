@@ -45,8 +45,8 @@ export default {
             this.suggestions.push(suggestion);
           }
         }
-      }).catch((error) => {
-        console.log(error);
+      }).catch(() => {
+        this.displayError('error_unexpected');
       });
     },
     playerUpdated(player) {
@@ -63,8 +63,8 @@ export default {
           this.playerUpdated(data.payload);
         } else this.playerUpdated(data);
         this.$emit('blur');
-      }).catch((error) => {
-        console.log(error);
+      }).catch(() => {
+        this.displayError('error_unexpected');
       });
     },
 

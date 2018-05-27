@@ -5,5 +5,9 @@ export default {
       const active = this.$route.path.startsWith(url);
       return { 'uk-active': active };
     },
+    navigate(params) {
+      this.clearMessages();
+      this.$router.push(params);
+    },
   },
 };

@@ -2,7 +2,7 @@ const express = require('express');
 const config = require('../config.js');
 
 const router = express.Router();
-
+/*
 const initData = async (M) => {
   try {
     await M.Player.remove({});
@@ -15,6 +15,8 @@ const initData = async (M) => {
 router.get('/init', (req, res) => {
   res.json({ status: initData(res.M) });
 });
+*/
+// Returns application version
 router.get('/version', (req, res) => {
   res.json({ version: config.version });
 });

@@ -8,7 +8,7 @@
 
           <ul class="uk-navbar-nav">
               <li :class="classActive('/home')">
-                <icon url="#/home" icon="home" :size="2"></icon>
+                <icon url="#/home" icon="home" :size="1"></icon>
               </li>
           </ul>
 
@@ -21,17 +21,20 @@
       <div class="uk-navbar-right">
 
           <ul class="uk-navbar-nav">
-              <li class="uk-nav-muted"><a>{{ name }}</a></li>
+              <li :hidden="loggedIn" :class="classActive('/register')">
+                <a href="#/registration_request">{{ L.register }}</a></li>
+              <li :hidden="loggedIn" :class="classActive('/sign_in')">
+                <a href="#/sign_in">{{ L.sign_in }}</a></li>
+              <li :hidden="!loggedIn">
+                <icon url="#/home" icon="user" :size="1"></icon></li>
               <li>
-                <icon icon="menu" :size="2"></icon>
+                <icon icon="menu" :size="1"></icon>
                 <div class="uk-navbar-dropdown">
                     <ul class="uk-nav uk-navbar-dropdown-nav">
                         <li :class="classActive('/games')">
-                          <a href="#/games">{{ L.my_games }}</a>
-                        </li>
+                          <a href="#/games">{{ L.my_games }}</a></li>
                         <li class="uk-nav-divider"></li>
                         <li class="uk-nav-muted">{{ L.bluejong }} {{ $store.state.version }}</li>
-
                     </ul>
                 </div>
               </li>
@@ -43,18 +46,18 @@
 </template>
 
 <script>
+import AuthMixin from '@/framework/mixins/authMixin';
 
 export default {
   name: 'Nav',
+  mixins: [AuthMixin],
   data() {
     return {
     };
   },
   computed: {
     name() {
-      const type = this.$store.getters['auth/type'];
-      const name = this.$store.getters['auth/name'];
-      return type === 'guest' ? this.L.guest : name;
+      return this.userType === 'guest' ? this.L.guest : this.userName;
     },
   },
 };

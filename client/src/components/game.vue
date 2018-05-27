@@ -130,7 +130,7 @@ export default {
       this.game_id = this.$route.params.id;
       this.gameService.get(this.game_id).then((response) => {
         if (response.data.status === 'ko') {
-          this.$store.commit('message/error', response.data.message);
+          this.displayError(response.data.message);
         } else {
           const game = response.data;
           // Unpacking Rules
@@ -153,7 +153,7 @@ export default {
           this.penaltySlots = game.penaltySlots;
           this.loaded = true;
         }
-      }).catch(() => this.messagesService.error('unexpected_error'));
+      }).catch(() => this.displayError('error_unexpected'));
     },
     // Saves the game
     save() {

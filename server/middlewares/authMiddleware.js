@@ -25,6 +25,7 @@ function createRouter(connection) {
         let newUser = {
           type: 'guest',
           name: 'Guest',
+          auth: {},
         };
         newUser = await res.M.User(newUser).save();
         req.session.user = newUser;
@@ -34,7 +35,7 @@ function createRouter(connection) {
       next();
     } catch (err) {
       // Oups!
-      res.sendResponse('error persisting user');
+      res.sendUnexpectedError(err);
     }
   });
 

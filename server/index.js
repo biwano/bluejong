@@ -1,10 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const config = require('./config.js');
-const persistence = require('./middlewares/persistence.js');
-const auth = require('./middlewares/auth.js');
-const helpers = require('./middlewares/helpers.js');
+const loggerMiddleware = require('./middlewares/loggerMiddleware.js');
+const modelMiddleware = require('./middlewares/modelMiddleware.js');
+const persistenceHelpers = require('./helpers/persistenceHelpers.js');
+const authMiddleware = require('./middlewares/authMiddleware.js');
+const mailMiddleware = require('./middlewares/mailMiddleware.js');
+const responseMiddleware = require('./middlewares/responseMiddleware.js');
+
 const adminRoute = require('./routes/adminRoute.js');
 const playerRoute = require('./routes/playerRoute.js');
 const gameRoute = require('./routes/gameRoute.js');
@@ -12,13 +15,15 @@ const authRoute = require('./routes/authRoute.js');
 
 const app = express();
 
-const connection = persistence.connect(config.persistence.url);
+const connection = persistenceHelpers.connect();
 
 connection.once('open', () => {
-  app.use(helpers);
   app.use(bodyParser.json());
-  app.use(persistence.router);
-  app.use(auth(connection));
+  app.use(loggerMiddleware);
+  app.use(responseMiddleware);
+  app.use(modelMiddleware);
+  app.use(mailMiddleware);
+  app.use(authMiddleware(connection));
 
   app.use('/api/admin', adminRoute);
   app.use('/api/player', playerRoute);

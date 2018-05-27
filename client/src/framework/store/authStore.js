@@ -7,6 +7,7 @@ const authStore = {
   getters: {
     name: state => (state.user !== undefined ? state.user.name : ''),
     type: state => (state.user !== undefined ? state.user.type : ''),
+    loggedIn: state => (state.user !== undefined && state.user.type === 'registered'),
   },
   mutations: {
     authenticate(state, user) {

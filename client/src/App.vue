@@ -16,22 +16,15 @@ export default {
   mixins: [AuthMixin],
   components: { navigation: Nav, messages: Messages },
   created() {
-    this.authService.getUserInfo().then((response) => {
-      if (response.status !== 'ko') {
-        this.$store.commit('auth/authenticate', response.data);
-      }
-    }).catch(() => {
-      this.messagesService.error('unexpected_error');
-    });
+    this.authGetUserInfo();
   },
 };
 </script>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+}
+.button-submit {
+  margin-top:16px;
 }
 </style>
