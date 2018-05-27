@@ -3,7 +3,7 @@
     <span class="uk-card-title">{{ L.enter_email }}</span>
       <input  :class="emailClass(email)" :placeholder="L.email"
        type="email" v-model="email" @keyup.enter="register()"/>
-      <button :hidden="!valid" class="uk-button uk-button-primary button-submit"
+      <button :disabled="!valid" class="uk-button uk-button-primary button-submit"
         @click="requestRegistration()">
         {{ L.request_registration }}
       </button>

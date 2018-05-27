@@ -5,6 +5,7 @@ export default {
   error_unexpected: 'An unexpected error occured',
   error_email_taken: 'There is already an account associated with this email address',
   submit: 'Submit',
+  save: 'Save',
   // Navigation
   home: 'Home',
   my_games: 'My games',
@@ -16,13 +17,19 @@ export default {
   enter_email: 'Enter your email address',
   enter_password: 'Enter a password (at least 8 characters)',
   enter_password_confirmation: 'Confirm the password',
+  enter_name: 'Enter your name',
   email_sent: 'An email was sent to your email address. Click on the link provided to activate your account',
   email: 'Email',
   password: 'Password',
+  name: 'Name',
   register_ok: 'Account registered successfully, you can now sign in',
   registration_for: 'Enter a password for account',
   error_token_invalid: 'This link is no longer valid',
   error_auth_failed: 'The credentials you provided are invalid',
+  forbidden_page_not_logged_in: 'You cannot access this page because you are not logged in',
+  // Profile
+  profile: 'Profile',
+  profile_saved: 'Profile saved successfully',
   // Game
   players: 'Players',
   select_player: 'Select player',

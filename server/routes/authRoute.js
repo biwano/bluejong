@@ -7,18 +7,37 @@ const router = express.Router();
 
 // Get user information
 router.get('/', async (req, res) => {
-  const user = {
-    type: req.user.type,
-    name: req.user.name,
-    roles: req.user.auth.roles,
-  };
-  res.sendData(user);
+  try {
+    const user = {
+      type: req.user.type,
+      name: req.user.name,
+      login: req.user.auth.login,
+      roles: req.user.auth.roles,
+    };
+    res.sendData(user);
+  } catch (e) {
+    res.sendException(e);
+  }
+});
+// Update user information
+router.post('/', async (req, res) => {
+  try {
+    const user = await res.M.User.findById(req.session.user._id);
+    const data = req.body;
+    if (data.name) user.name = data.name;
+
+    req.session.user = await user.save();
+
+    res.sendSuccess();
+  } catch (e) {
+    res.sendException(e);
+  }
 });
 // Request registration
 router.post('/request_registration', async (req, res) => {
-  const email = req.body.email;
-  // checking if email already used
   try {
+    const email = req.body.email;
+    // checking if email already used
     if (await res.M.User.findOne({ 'auth.login': email }) !== null) {
       res.sendError('error_email_taken');
     } else {
@@ -98,8 +117,6 @@ router.post('/sign_in', async (req, res) => {
       res.sendResponse('error_auth_failed');
     } else {
       // Generating password
-      console.log(user.auth.password);
-      console.log(password);
       const result = await bcrypt.compare(password, user.auth.password);
       if (result) res.sendSuccess();
       else res.sendError('error_auth_failed');

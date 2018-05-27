@@ -6,6 +6,9 @@ export default {
     userName() {
       return this.$store.getters['auth/name'];
     },
+    userLogin() {
+      return this.$store.getters['auth/login'];
+    },
     userType() {
       return this.$store.getters['auth/type'];
     },
@@ -27,6 +30,9 @@ export default {
     },
     authRequestRegistration(email) {
       return http.post('auth/request_registration', { email });
+    },
+    authUpdateProfile(params) {
+      return http.post('auth', params);
     },
     authCheckToken(token) {
       return http.get(`auth/check_token/${encodeURI(token)}`);

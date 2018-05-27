@@ -6,6 +6,7 @@ const authStore = {
   },
   getters: {
     name: state => (state.user !== undefined ? state.user.name : ''),
+    login: state => (state.user !== undefined ? state.user.login : ''),
     type: state => (state.user !== undefined ? state.user.type : ''),
     loggedIn: state => (state.user !== undefined && state.user.type === 'registered'),
   },

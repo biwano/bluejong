@@ -6,6 +6,7 @@ import Game from '@/components/game';
 import Register from '@/components/register';
 import RegistrationRequest from '@/components/registrationRequest';
 import SignIn from '@/components/signIn';
+import Profile from '@/components/profile';
 
 Vue.use(Router);
 
@@ -18,5 +19,6 @@ export default new Router({
     { path: '/sign_in', name: 'SignIn', component: SignIn },
     { path: '/games', name: 'Games', component: Games },
     { path: '/game/:id', name: 'Game', component: Game },
+    { path: '/profile', name: 'Profile', component: Profile },
   ],
 });

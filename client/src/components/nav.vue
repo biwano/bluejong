@@ -26,11 +26,13 @@
               <li :hidden="loggedIn" :class="classActive('/sign_in')">
                 <a href="#/sign_in">{{ L.sign_in }}</a></li>
               <li :hidden="!loggedIn">
-                <icon url="#/home" icon="user" :size="1"></icon></li>
+                <icon url="#/profile" icon="user" :size="1"></icon></li>
               <li>
                 <icon icon="menu" :size="1"></icon>
                 <div class="uk-navbar-dropdown">
                     <ul class="uk-nav uk-navbar-dropdown-nav">
+                        <li class="uk-nav-muted">{{ userName }}</li>
+                        <li class="uk-nav-divider"></li>
                         <li :class="classActive('/games')">
                           <a href="#/games">{{ L.my_games }}</a></li>
                         <li class="uk-nav-divider"></li>

@@ -1,4 +1,7 @@
 export default {
+  created() {
+    this.clearMessages();
+  },
   methods: {
     clearMessages() {
       this.$store.commit('message/clear');

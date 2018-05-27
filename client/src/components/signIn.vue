@@ -11,7 +11,7 @@
        @keyup.enter="signIn()"/>
     </div>
     <div class="uk-margin">
-      <button class="uk-button uk-button-primary" @click="signIn()">
+      <button :disabled="!valid" class="uk-button uk-button-primary" @click="signIn()">
         {{ L.sign_in }}
       </button>
     </div>

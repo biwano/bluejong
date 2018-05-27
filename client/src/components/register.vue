@@ -12,7 +12,7 @@
     @keyup.enter="register()"/>
     </div>
     <div class="uk-margin">
-      <button :hidden="!valid" class="uk-button uk-button-primary" @click="register()">
+      <button :disabled="!valid" class="uk-button uk-button-primary" @click="register()">
         {{ L.register }}
       </button>
     </div>

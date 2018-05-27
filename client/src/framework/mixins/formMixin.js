@@ -19,6 +19,7 @@ export default {
       const valueOk = text !== undefined && text.length >= minChars;
       return this.baseClass(valueOk);
     },
+
     // Returns class for fields with same value
     sameAsClass(text1, text2) {
       return this.baseClass(text1 === text2);
