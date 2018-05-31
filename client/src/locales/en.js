@@ -53,4 +53,6 @@ export default {
   game_not_found: 'Game not found',
   no_games: 'No games found',
   MCR: 'MCR',
+  // Tournament
+  new_tournament: 'New tournament',
 };

@@ -3,7 +3,7 @@ import config from '@/config';
 
 export default axios.create({
   baseURL: config.http.baseURL,
-  timeout: 5000,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -5,17 +5,22 @@
               <h3 class="uk-card-title">{{ L.new_game }}</h3>
               <a v-on:click="newGame('mcr')">{{ L.MCR }}</a>
           </div>
+          <div class="uk-card uk-card-default uk-card-body">
+              <h3 class="uk-card-title">{{ L.new_tournament }}</h3>
+              <a v-on:click="newTournament('mcr')">{{ L.MCR }}</a>
+          </div>
       </div>
   </div>
 </template>
 
 <script>
 import GameMixin from '@/mixins/gameMixin';
+import TournamentMixin from '@/mixins/tournamentMixin';
 import debounce from 'lodash.debounce';
 
 export default {
   name: 'Home',
-  mixins: [GameMixin],
+  mixins: [GameMixin, TournamentMixin],
   data() {
     return {
       loading: false,
@@ -23,12 +28,19 @@ export default {
   },
   created() {
     this.newGame = debounce(this.newGame, 500);
+    this.newTournament = debounce(this.newTournament, 500);
   },
   methods: {
     newGame(gameType) {
       this.gameService.create(gameType).then((response) => {
         this.$router.push({ name: 'Game', params: { id: response.data._id } });
         this.loading = false;
+      }).catch(() => { this.loading = false; });
+    },
+    newTournament(gameType) {
+      this.tournamentService.create(gameType).then((response) => {
+        // this.$router.push({ name: 'Tournament', params: { id: response.data._id } });
+        // this.loading = false;
       }).catch(() => { this.loading = false; });
     },
   },
