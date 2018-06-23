@@ -6,6 +6,8 @@ export default {
   error_email_taken: 'There is already an account associated with this email address',
   submit: 'Submit',
   save: 'Save',
+  yes: 'Yes',
+  no: 'No',
   // Navigation
   home: 'Home',
   my_games: 'My games',
@@ -30,6 +32,12 @@ export default {
   // Profile
   profile: 'Profile',
   profile_saved: 'Profile saved successfully',
+  profile_danger: 'Activate profile danger zone',
+  profile_safe: 'Hide danger zone',
+  profile_anonymize: 'Anonimyze account',
+  profile_anonymize_info_1: 'Your personal information will be deleted.',
+  profile_anonymize_info_2: 'You will no longer be able to log in to this account.',
+  profile_anonymize_info_3: 'Your games data may be deleted any time',
   // Game
   players: 'Players',
   select_player: 'Select player',
@@ -50,9 +58,19 @@ export default {
   totals: 'Totals',
   table_points: 'Table points',
   new_game: 'New game',
-  game_not_found: 'Game not found',
+  error_game_not_found: 'Game not found',
   no_games: 'No games found',
   MCR: 'MCR',
   // Tournament
   new_tournament: 'New tournament',
+  tournament_name: 'Tournament name',
+  tournament_configuration: 'Configuration',
+  tournament_preparation: 'Preparation',
+  team_tournament: 'Team tournament',
+  error_tournament_not_found: 'Tournament not found',
+  number_of_players: 'Number of players',
+  number_of_rounds: 'Number of rounds',
+  teams_size: 'Teams\' size',
+  round_model: 'Players\' distribution',
+  round_model_min_encounters: 'Minimize encounters',
 };

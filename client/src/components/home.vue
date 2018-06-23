@@ -33,14 +33,22 @@ export default {
   methods: {
     newGame(gameType) {
       this.gameService.create(gameType).then((response) => {
-        this.$router.push({ name: 'Game', params: { id: response.data._id } });
-        this.loading = false;
+        if (response.data.status === 'ko') {
+          this.displayError(response.data.message);
+        } else {
+          this.$router.push({ name: 'Game', params: { id: response.data._id } });
+          this.loading = false;
+        }
       }).catch(() => { this.loading = false; });
     },
     newTournament(gameType) {
       this.tournamentService.create(gameType).then((response) => {
-        // this.$router.push({ name: 'Tournament', params: { id: response.data._id } });
-        // this.loading = false;
+        if (response.data.status === 'ko') {
+          this.displayError(response.data.message);
+        } else {
+          this.$router.push({ name: 'Tournament', params: { id: response.data._id } });
+          this.loading = false;
+        }
       }).catch(() => { this.loading = false; });
     },
   },

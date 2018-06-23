@@ -9,8 +9,8 @@ const schema = mongoose.Schema({
   updated: Date,
   rules: String,
   playerSlots: [{ index: Number, player: { type: ObjectId, ref: 'Player' } }],
-  roundSlots: [{ index: Number,
-    round: { wind: String,
+  handSlots: [{ index: Number,
+    hand: { wind: String,
       winnerIndex: Number,
       pickedOnIndex: Number,
       score: Number,
@@ -23,13 +23,13 @@ const schema = mongoose.Schema({
       points: [Number],
     },
   }],
-  totals: [Number],
-  tablePoints: [Number],
+  totals: {},
+  tablePoints: {},
   status: String,
 });
-// Packing players before save
 schema.pre('save', function presave(next) {
   helpers.preSave(this);
+  // Packing players before save
   for (let i = 0; i < this.playerSlots.length; i += 1) {
     const slot = this.playerSlots[i];
     if (slot.player !== undefined && slot.player._id !== undefined) {

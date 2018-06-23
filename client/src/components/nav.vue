@@ -31,7 +31,12 @@
                 <icon icon="menu" :size="1"></icon>
                 <div class="uk-navbar-dropdown">
                     <ul class="uk-nav uk-navbar-dropdown-nav">
-                        <li class="uk-nav-muted">{{ userName }}</li>
+                        <li class="uk-nav-muted" style="white-space: nowrap">
+                          <a :hidden="!loggedIn" href="#/profile">{{ userName }}</a>
+                          <span :hidden="loggedIn">{{userName}}</span>
+                           <icon :hidden="!loggedIn" @click="signOut()"
+                                icon="sign-out" :size="1"></icon>
+                        </li>
                         <li class="uk-nav-divider"></li>
                         <li :class="classActive('/games')">
                           <a href="#/games">{{ L.my_games }}</a></li>
@@ -56,6 +61,18 @@ export default {
   data() {
     return {
     };
+  },
+  methods: {
+    signOut() {
+      this.authSignOut().then((response) => {
+        if (response.data.status === 'ko') {
+          this.displayError(response.data.message);
+        } else {
+          this.authGetUserInfo();
+          this.navigate({ name: 'Home' });
+        }
+      }).catch(() => this.messagesService.error('error_unexpected'));
+    },
   },
   computed: {
     name() {

@@ -10,25 +10,25 @@
           <th class="uk-text-center" v-if="ready">{{ L.picked_on }}</th>
           <th class="uk-text-center" v-if="ready">{{ L.points }}</th>
           <th v-for="playerSlot in playerSlots" :key="playerSlot.index">
-            <game-player-chooser
+            <player-chooser
               v-model="playerSlot.player"
               @input="playerUpdated(playerSlot)"
               :suggestionFilter="playerSuggestionFilter"
               :placeholder="playerChooserPlaceholder(playerSlot)"
               :ref="`chooser${playerSlot.index}`">
-            </game-player-chooser>
+            </player-chooser>
           </th>
         </tr>
       </thead>
-      <!-- Rounds -->
+      <!-- Hands -->
       <tbody>
-        <game-round v-for="roundSlot in roundSlots" :key="roundSlot.index"
+        <game-hand v-for="handSlot in handSlots" :key="handSlot.index"
           :playerSlots="playerSlots"
-          :round="roundSlot.round" v-on:update:round="roundUpdated(roundSlot, $event)"
-          @validated="roundValidated(roundSlot, $event)"
-          :ref="`round${roundSlot.index}`"
+          :hand="handSlot.hand" v-on:update:hand="handUpdated(handSlot, $event)"
+          @validated="handValidated(handSlot, $event)"
+          :ref="`hand${handSlot.index}`"
           :rules="rules">
-        </game-round>
+        </game-hand>
       </tbody>
       <!-- Penalty lines -->
       <tbody :hidden="penaltySlots.length===0">
@@ -88,15 +88,15 @@
 </template>
 
 <script>
-import GameRound from '@/components/gameRound';
-import PenaltyLine from '@/components/penaltyLine';
-import GamePlayerChooser from '@/components/gamePlayerChooser';
-import rulesSets from '@/business/rulesSets';
-import GameMixin from '@/mixins/gameMixin';
 import '@/assets/east.png';
 import '@/assets/west.png';
 import '@/assets/north.png';
 import '@/assets/south.png';
+import rulesSets from '@/business/rulesSets';
+import GameMixin from '@/mixins/gameMixin';
+import PlayerChooser from '../player/playerChooser';
+import GameHand from './gameHand';
+import PenaltyLine from './penaltyLine';
 
 export default {
   name: 'Game',
@@ -108,8 +108,8 @@ export default {
         { index: 1, player: undefined },
         { index: 2, player: undefined },
         { index: 3, player: undefined }],
-      // Rounds
-      roundSlots: [],
+      // Hands
+      handSlots: [],
       penaltySlots: [],
       // Table point distribution
       rules: rulesSets.mcr,
@@ -147,9 +147,9 @@ export default {
               playerSlot.player = undefined;
             }
           }
-          // Unpacking Rounds
-          this.roundSlots = game.roundSlots;
-          // Unpacking Rounds
+          // Unpacking Hands
+          this.handSlots = game.handSlots;
+          // Unpacking Hands
           this.penaltySlots = game.penaltySlots;
           this.loaded = true;
         }
@@ -159,7 +159,7 @@ export default {
     save() {
       this.$nextTick(() => {
         this.gameService.save(this.game_id, {
-          roundSlots: this.roundSlots,
+          handSlots: this.handSlots,
           playerSlots: this.playerSlots,
           penaltySlots: this.penaltySlots,
           totals: this.totals,
@@ -168,14 +168,14 @@ export default {
         });
       });
     },
-    // A round is updated, a new round is created if this one is valid
-    roundUpdated(roundSlot_, round) {
-      const roundSlot = roundSlot_;
-      roundSlot.round = round;
-      if (this.isLastRoundSlot(roundSlot) && this.rules.isValid(roundSlot.round)) {
-        const nextRound = this.rules.nextRoundSlot(roundSlot);
-        if (nextRound !== undefined) {
-          this.roundSlots.push(nextRound);
+    // A hand is updated, a new hand is created if this one is valid
+    handUpdated(handSlot_, hand) {
+      const handSlot = handSlot_;
+      handSlot.hand = hand;
+      if (this.isLastHandSlot(handSlot) && this.rules.isValid(handSlot.hand)) {
+        const nextHand = this.rules.nextHandSlot(handSlot);
+        if (nextHand !== undefined) {
+          this.handSlots.push(nextHand);
         }
       }
       this.save();
@@ -186,10 +186,10 @@ export default {
       penaltySlot.penaltyLine = penaltyLine;
       this.save();
     },
-    // A round is validated (enter pressed => focus next round)
-    roundValidated(roundSlot) {
-      if (!this.isLastRoundSlot(roundSlot)) {
-        this.focusRound(this.roundSlots[roundSlot.index + 1]);
+    // A hand is validated (enter pressed => focus next hand)
+    handValidated(handSlot) {
+      if (!this.isLastHandSlot(handSlot)) {
+        this.focusHand(this.handSlots[handSlot.index + 1]);
       }
     },
     // Filters players already selected
@@ -203,9 +203,9 @@ export default {
       }
       return res;
     },
-    // Is this the last roundSlot?
-    isLastRoundSlot(roundSlot) {
-      return roundSlot.index === this.roundSlots.length - 1;
+    // Is this the last handSlot?
+    isLastHandSlot(handSlot) {
+      return handSlot.index === this.handSlots.length - 1;
     },
     // A player was updated
     playerUpdated(playerSlot) {
@@ -224,15 +224,15 @@ export default {
           }
         }
       }
-      // Creating first round if it does not exists
-      if (this.roundSlots.length === 0) {
-        this.roundSlots.push(this.rules.nextRoundSlot());
+      // Creating first hand if it does not exists
+      if (this.handSlots.length === 0) {
+        this.handSlots.push(this.rules.nextHandSlot());
       }
-      this.focusRound(this.roundSlots[0]);
+      this.focusHand(this.handSlots[0]);
     },
-    // Change focus to a round
-    focusRound(roundSlot) {
-      this.$nextTick(() => this.$refs[`round${roundSlot.index}`][0].focus());
+    // Change focus to a hand
+    focusHand(handSlot) {
+      this.$nextTick(() => this.$refs[`hand${handSlot.index}`][0].focus());
     },
     // placeholder for player chooser
     playerChooserPlaceholder(playerSlot) {
@@ -246,11 +246,11 @@ export default {
   computed: {
     // Players' totals
     totals() {
-      return this.rules.totals(this.playerSlots, this.roundSlots, this.penaltySlots);
+      return this.rules.totals(this.playerSlots, this.handSlots, this.penaltySlots);
     },
     // Players' table points
     tablePoints() {
-      return this.rules.tablePoints(this.playerSlots, this.roundSlots, this.penaltySlots);
+      return this.rules.tablePoints(this.playerSlots, this.handSlots, this.penaltySlots);
     },
     // game ready if all players are filled
     ready() {
@@ -271,13 +271,13 @@ export default {
     },
     // game is finished?
     status() {
-      return this.rules.isFinished(this.roundSlots) ? 'ongoing' : 'finished';
+      return this.rules.isFinished(this.handSlots) ? 'ongoing' : 'finished';
     },
   },
   components: {
-    'game-round': GameRound,
+    'game-hand': GameHand,
     'penalty-line': PenaltyLine,
-    'game-player-chooser': GamePlayerChooser,
+    'player-chooser': PlayerChooser,
   },
 };
 </script>

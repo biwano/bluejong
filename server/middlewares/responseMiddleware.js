@@ -12,15 +12,15 @@ router.use((req, res, next) => {
     res.sendResponse();
   };
   res.sendError = function error(err, payload) {
-    res.sendResponse(err, payload);
+    res.sendResponse(`error_${err}`, payload);
   };
   res.sendUnexpectedError = function unexpected(err) {
     res.Logger.error(err);
-    res.sendResponse('error_unexpected', err);
+    res.sendError('unexpected', err);
   };
   res.sendException = function unexpected(exception) {
     res.Logger.exception(exception);
-    res.sendResponse('error_unexpected', exception);
+    res.sendError('unexpected', exception);
   };
   res.sendData = function sendData(data) {
     res.Logger.debug(data);

@@ -41,7 +41,7 @@
       v-model.number="score"
       ref="score"
       :hidden="!hasWinner"
-      @keyup.enter="$emit('validated', round)"/>
+      @keyup.enter="$emit('validated', hand)"/>
     </th>
     <!-- Player points -->
     <td v-for="playerSlot in playerSlots" :key="playerSlot.index"  v-if="rules.isValid(newData)"
@@ -54,14 +54,14 @@
 
 <script>
 export default {
-  name: 'GameRound',
-  props: ['playerSlots', 'round', 'rules'],
+  name: 'GameHand',
+  props: ['playerSlots', 'hand', 'rules'],
   data() {
     return {
-      winnerIndex: this.round.winnerIndex,
-      pickedOnIndex: this.round.pickedOnIndex,
-      score: this.round.score,
-      wind: this.round.wind,
+      winnerIndex: this.hand.winnerIndex,
+      pickedOnIndex: this.hand.pickedOnIndex,
+      score: this.hand.score,
+      wind: this.hand.wind,
     };
   },
   created() {
@@ -79,9 +79,9 @@ export default {
 
       for (let i = 0; i < this.playerSlots.length; i += 1) {
         const index = this.playerSlots[i].index;
-        newData.points[index] = this.rules.playerRoundPoints(newData, index);
+        newData.points[index] = this.rules.playerHandPoints(newData, index);
       }
-      this.$emit('update:round', newData);
+      this.$emit('update:hand', newData);
       return newData;
     },
     focus() {
@@ -103,7 +103,7 @@ export default {
       return this.compute();
     },
     windURL() {
-      return `../static/img/${this.round.wind}.png`;
+      return `../static/img/${this.hand.wind}.png`;
     },
     hasWinner() {
       return this.winnerIndex >= 0;
@@ -113,10 +113,10 @@ export default {
 </script>
 <style scoped>
 .winner {
-  background-color: #efe;
+  backghand-color: #efe;
 }
 .pickedOn {
-  background-color: #fee;
+  backghand-color: #fee;
 }
 .points {
   width:60px;

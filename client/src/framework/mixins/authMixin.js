@@ -43,6 +43,12 @@ export default {
     authSignIn(email, password) {
       return http.post('auth/sign_in', { email, password });
     },
+    authSignOut() {
+      return http.post('auth/sign_out', { });
+    },
+    authAnonymizeProfile() {
+      return http.post('auth/anonymize', { });
+    },
     authIsEmailValid(email) {
       const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);

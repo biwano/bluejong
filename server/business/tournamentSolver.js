@@ -58,7 +58,7 @@ module.exports = {
     }
     return xPRTs;
   },
-  // Optimizes the Distribution of players across tables and rounds
+  // Optimizes the distribution of players across tables and rounds
   async solveBEOptimize(players, rounds, maxMeetups) {
     let model = [];
     const tables = players.length / 4;
@@ -91,7 +91,7 @@ module.exports = {
         model.push(equation);
       }
     }
-    // Defining  y.p1.p2.r.t = x.p1.r.t*x.p2.r.t
+    // Defining y.p1.p2.r.t = x.p1.r.t * x.p2.r.t
     for (let r = 0; r < rounds; r += 1) {
       for (let t = 0; t < tables; t += 1) {
         for (let p1 = 0; p1 < players.length - 1; p1 += 1) {
@@ -108,7 +108,7 @@ module.exports = {
       }
     }
 
-    // Players meet < maxMeetups
+    // Every npair of players meet <= maxMeetups
     for (let p1 = 0; p1 < players.length - 1; p1 += 1) {
       for (let p2 = p1 + 1; p2 < players.length; p2 += 1) {
         equation = '0';
@@ -122,7 +122,7 @@ module.exports = {
       }
     }
 
-    // Contraintes booleens
+    // Booleens constraints on xPRTs
     for (let r = 0; r < rounds; r += 1) {
       for (let t = 0; t < tables; t += 1) {
         for (let p = 0; p < players.length; p += 1) {
@@ -131,6 +131,8 @@ module.exports = {
         }
       }
     }
+
+    // Booleens constraints on yP1P2RTs
     for (let r = 0; r < rounds; r += 1) {
       for (let t = 0; t < tables; t += 1) {
         for (let p1 = 0; p1 < players.length - 1; p1 += 1) {
@@ -165,6 +167,7 @@ module.exports = {
     lpSolve.stdin.write(model);
     lpSolve.stdin.end();
 
+    // Returning arrangement or null if infeasible
     return new Promise((resolve) => {
       lpSolve.on('close', () => {
         resolve(this.arrangementFromXPRTs(xPRTs));
@@ -186,10 +189,11 @@ module.exports = {
       this.shuffleArray(playersShuffled);
       let tableIndex = 0;
       let table;
+      // Round initialization
       rounds[r] = { tables: {} };
       const round = rounds[r];
       for (let p = 0; p < players.length; p += 1) {
-        // table initialization
+        // Table initialization
         if (p % 4 === 0) {
           tableIndex = p / 4;
           round.tables[tableIndex] = [];
@@ -201,7 +205,8 @@ module.exports = {
     }
     return rounds;
   },
-  // Distributes players across tables and rounds
+  // Distributes players across tables and rounds minimizing meetups of same couple of players
+  // Returns a random distribution if things get out of hand
   async solve(players, rounds, maxMeetups_) {
     // We try to let everyone meet one time max
     let maxMeetups = maxMeetups_ || 1;

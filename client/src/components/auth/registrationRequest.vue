@@ -1,11 +1,14 @@
 <template>
   <div :hidden="done" class="uk-card uk-card-default uk-card-body">
     <span class="uk-card-title">{{ L.enter_email }}</span>
-      <input  :class="emailClass(email)" :placeholder="L.email"
+      <input  class="uk-input"
+       data-validation-definition="validateEmail(email)"
+       :placeholder="L.email"
        type="email" v-model="email" @keyup.enter="register()"/>
-      <button :disabled="!valid" class="uk-button uk-button-primary button-submit"
+      <button :disabled="!validationStatus.valid"
+        class="uk-button uk-button-primary button-submit"
         @click="requestRegistration()">
-        {{ L.request_registration }}
+          {{ L.request_registration }}
       </button>
 
   </div>
@@ -27,7 +30,7 @@ export default {
   methods: {
     // Registers user
     requestRegistration() {
-      if (this.valid) {
+      if (this.validationStatus.valid) {
         this.authRequestRegistration(this.email).then((response) => {
           if (response.data.status === 'ko') {
             this.displayError(response.data.message);
@@ -37,11 +40,6 @@ export default {
           }
         }).catch(() => this.displayError('error_unexpected'));
       }
-    },
-  },
-  computed: {
-    valid() {
-      return this.authIsEmailValid(this.email);
     },
   },
 };

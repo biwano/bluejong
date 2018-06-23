@@ -12,6 +12,7 @@ import messages from '@/framework/mixins/messagesMixin';
 import createStore from '@/store/store';
 import App from './App';
 import Suggestion from './framework/components/suggestion';
+import BooleanRadio from './framework/components/booleanRadio';
 import Icon from './framework/components/icon';
 import router from './router';
 
@@ -31,6 +32,7 @@ Vue.mixin(messages);
 // Importing components globally
 Vue.component('suggestion', Suggestion);
 Vue.component('icon', Icon);
+Vue.component('boolean-radio', BooleanRadio);
 
 /* eslint-disable no-new */
 new Vue({

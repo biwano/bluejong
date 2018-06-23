@@ -1,20 +1,29 @@
 <template>
   <div class="uk-card uk-card-default uk-card-body">
     <span class="uk-card-title">{{ L.sign_in }}</span><br/>
-    <div class="uk-margin">
-      <input :class="emailClass(email)" type="email" :placeholder="L.email" v-model="email"
-       @keyup.enter="signIn()"/>
-    </div>
-    <div class="uk-margin">
-      <input :class="requiredClass(password,8)" type="password" :placeholder="L.password"
-      v-model="password"
-       @keyup.enter="signIn()"/>
-    </div>
-    <div class="uk-margin">
-      <button :disabled="!valid" class="uk-button uk-button-primary" @click="signIn()">
-        {{ L.sign_in }}
-      </button>
-    </div>
+    <form>
+      <div class="uk-margin">
+        <input class="uk-input"
+        data-validation-definition="validateEmail(email)"
+        type="email" :placeholder="L.email" v-model="email"
+        autocomplete="username"
+         @keyup.enter="signIn()"/>
+      </div>
+      <div class="uk-margin">
+        <input class="uk-input"
+        data-validation-definition="validateMinChars(password, 8)"
+        type="password" :placeholder="L.password"
+        autocomplete="current-password"
+        v-model="password"
+         @keyup.enter="signIn()"/>
+      </div>
+      <div class="uk-margin">
+        <button :disabled="!validationStatus.valid"
+          class="uk-button uk-button-primary" @click="signIn()">
+          {{ L.sign_in }}
+        </button>
+      </div>
+    </form>
   </div>
 </template>
 
@@ -34,7 +43,7 @@ export default {
   methods: {
     // Sign in
     signIn() {
-      if (this.valid) {
+      if (this.validationStatus.valid) {
         this.authSignIn(this.email, this.password).then((response) => {
           if (response.data.status === 'ko') {
             this.displayError(response.data.message);
@@ -44,12 +53,6 @@ export default {
           }
         }).catch(() => this.messagesService.error('error_unexpected'));
       }
-    },
-  },
-  computed: {
-    valid() {
-      return this.authIsEmailValid(this.email)
-        && this.authIsPasswordValid(this.password);
     },
   },
 };

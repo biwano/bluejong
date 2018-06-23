@@ -31,7 +31,7 @@
 
 <script>
 import PlayerMixin from '@/mixins/playerMixin';
-import PlayerSuggestion from './playerSuggestion';
+import PlayerSuggestion from '../player/playerSuggestion';
 
 export default {
   name: 'gamePlayerChooser',

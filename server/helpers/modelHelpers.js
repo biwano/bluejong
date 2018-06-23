@@ -7,4 +7,12 @@ module.exports = {
     }
     object.updated = date;
   },
+  packPlayers(playerSlots) {
+  	for (let i = 0; i < playerSlots.length; i += 1) {
+      const slot = playerSlots[i];
+      if (slot.player !== undefined && slot.player._id !== undefined) {
+        slot.player = slot.player._id;
+      }
+    }
+  },
 };

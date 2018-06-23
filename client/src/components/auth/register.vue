@@ -1,21 +1,34 @@
 <template>
   <div :hidden="tokenStatus!=='ok'" class="uk-card uk-card-default uk-card-body">
-    <span class="uk-card-title">{{ L.registration_for }}</span><br/>
-    {{email}}
-    <div class="uk-margin">
-      <input  :class="requiredClass(password, 8)" type="password" v-model="password"
-      :placeholder="L.enter_password" @keyup.enter="register()"/>
-    </div>
-    <div class="uk-margin">
-      <input  :class="sameAsClass(password, passwordConfirmation)" type="password"
-    v-model="passwordConfirmation" :placeholder="L.enter_password_confirmation"
-    @keyup.enter="register()"/>
-    </div>
-    <div class="uk-margin">
-      <button :disabled="!valid" class="uk-button uk-button-primary" @click="register()">
-        {{ L.register }}
-      </button>
-    </div>
+    <form>
+      <span class="uk-card-title">{{ L.registration_for }}</span><br/>
+      <div class="uk-margin">
+        <input  class="uk-input"
+        autocomplete="username"
+        type="text" v-model="email"
+        disabled/>
+      </div>
+      <div class="uk-margin">
+        <input  class="uk-input"
+        data-validation-definition="validateMinChars(password, 8)"
+        autocomplete="new-password"
+        type="password" v-model="password"
+        :placeholder="L.enter_password" @keyup.enter="register()"/>
+      </div>
+      <div class="uk-margin">
+        <input  class="uk-input" type="password"
+        autocomplete="new-password"
+        data-validation-definition="validateEqual(passwordConfirmation, password)"
+      v-model="passwordConfirmation" :placeholder="L.enter_password_confirmation"
+      @keyup.enter="register()"/>
+      </div>
+      <div class="uk-margin">
+        <button :disabled="!validationStatus.valid"
+          class="uk-button uk-button-primary" @click="register()">
+          {{ L.register }}
+        </button>
+      </div>
+    </form>
   </div>
 </template>
 
@@ -49,7 +62,7 @@ export default {
   methods: {
     // Registers user
     register() {
-      if (this.valid) {
+      if (this.validationStatus.valid) {
         const token = this.$route.params.token;
         this.authRegister(token, this.password).then((response) => {
           if (response.data.status === 'ko') {
@@ -61,12 +74,6 @@ export default {
           }
         }).catch(() => this.displayError('error_unexpected'));
       }
-    },
-  },
-  computed: {
-    valid() {
-      return this.password === this.passwordConfirmation
-        && this.authIsPasswordValid(this.password);
     },
   },
 };

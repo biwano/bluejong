@@ -7,30 +7,30 @@ const rulesSetBase = {
   MIN_MAHJONG_SCORE: 0,
   ROUND_DRAW: -2,
   PLAYER_NOT_CHOSEN: -1,
-  // Is the player is the winner of the round
-  isWinner(round, playerSlotIndex) {
-    return round.winnerIndex === playerSlotIndex;
+  // Is the player is the winner of the hand
+  isWinner(hand, playerSlotIndex) {
+    return hand.winnerIndex === playerSlotIndex;
   },
-  // Is the player was picked on in the round
-  isPickedOn(round, playerSlotIndex) {
-    return round.pickedOnIndex === playerSlotIndex
-      && !this.isWinner(round, playerSlotIndex)
-      && !this.isDraw(round);
+  // Is the player was picked on in the hand
+  isPickedOn(hand, playerSlotIndex) {
+    return hand.pickedOnIndex === playerSlotIndex
+      && !this.isWinner(hand, playerSlotIndex)
+      && !this.isDraw(hand);
   },
-  // Is this a self pick round
-  selfPick(round) {
-    return round.winnerIndex === round.pickedOnIndex;
+  // Is this a self pick hand
+  selfPick(hand) {
+    return hand.winnerIndex === hand.pickedOnIndex;
   },
-  // Is the round valid
-  isValid(round) {
-    return (round.winnerIndex !== this.PLAYER_NOT_CHOSEN &&
-      round.pickedOnIndex !== this.PLAYER_NOT_CHOSEN &&
-      round.score >= this.MIN_MAHJONG_SCORE) ||
-      this.isDraw(round);
+  // Is the hand valid
+  isValid(hand) {
+    return (hand.winnerIndex !== this.PLAYER_NOT_CHOSEN &&
+      hand.pickedOnIndex !== this.PLAYER_NOT_CHOSEN &&
+      hand.score >= this.MIN_MAHJONG_SCORE) ||
+      this.isDraw(hand);
   },
-  // Is it a draw round
-  isDraw(round) {
-    return round.winnerIndex === this.ROUND_DRAW;
+  // Is it a draw hand
+  isDraw(hand) {
+    return hand.winnerIndex === this.ROUND_DRAW;
   },
   // Is the penalty line completed properly
   isPenaltyLineValid(penaltyLine) {
@@ -42,16 +42,16 @@ const rulesSetBase = {
     return penaltyLine.offenderIndex === playerSlotIndex;
   },
   // Computes the totals of players
-  totals(playerSlots, roundSlots, penaltySlots) {
+  totals(playerSlots, handSlots, penaltySlots) {
     const totals = new Array(playerSlots.length);
     // For each player
     for (let i = 0; i < playerSlots.length; i += 1) {
       const playerSlot = playerSlots[i];
       let total = 0;
-      // Adding points of all valid rounds
-      for (let j = 0; j < roundSlots.length; j += 1) {
-        const round = roundSlots[j].round;
-        if (this.isValid(round)) total += round.points[playerSlot.index];
+      // Adding points of all valid hands
+      for (let j = 0; j < handSlots.length; j += 1) {
+        const hand = handSlots[j].hand;
+        if (this.isValid(hand)) total += hand.points[playerSlot.index];
         else break;
       }
       // Adding points of all valid penaltyLines
@@ -75,8 +75,8 @@ const rulesSetBase = {
     return points;
   },
   // compute the table points of the players
-  tablePoints(playerSlots, roundSlots, penaltySlots) {
-    const totals = this.totals(playerSlots, roundSlots, penaltySlots);
+  tablePoints(playerSlots, handSlots, penaltySlots) {
+    const totals = this.totals(playerSlots, handSlots, penaltySlots);
     const totalsArray = [];
     const tablePoints = new Array(playerSlots.length);
     // Sorting player totals in totals array
