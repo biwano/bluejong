@@ -42,7 +42,10 @@ const rulesSetBase = {
     return penaltyLine.offenderIndex === playerSlotIndex;
   },
   // Computes the totals of players
-  totals(playerSlots, handSlots, penaltySlots) {
+  totals(game) {
+    const playerSlots = game.playerSlots;
+    const handSlots = game.handSlots;
+    const penaltySlots = game.penaltySlots;
     const totals = new Array(playerSlots.length);
     // For each player
     for (let i = 0; i < playerSlots.length; i += 1) {
@@ -75,8 +78,9 @@ const rulesSetBase = {
     return points;
   },
   // compute the table points of the players
-  tablePoints(playerSlots, handSlots, penaltySlots) {
-    const totals = this.totals(playerSlots, handSlots, penaltySlots);
+  tablePoints(game) {
+    const playerSlots = game.playerSlots;
+    const totals = this.totals(game);
     const totalsArray = [];
     const tablePoints = new Array(playerSlots.length);
     // Sorting player totals in totals array
@@ -113,6 +117,11 @@ const rulesSetBase = {
     const index = previousPenaltySlot === undefined ? 0 : previousPenaltySlot.index + 1;
 
     return { index, penaltyLine: { offenderIndex, penalty } };
+  },
+  updateGame(game_) {
+    const game = game_;
+    game.tablePoints = this.tablePoints(game);
+    game.totals = this.totals(game);
   },
 };
 const rulesSets = {};

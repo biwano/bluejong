@@ -58,23 +58,15 @@ export default {
     // Loads the game
     load() {
       this.game_id = this.$route.params.id;
-      this.gameService.getAll().then((response) => {
-        if (response.data.status === 'ko') {
-          this.$store.commit('message/error', response.data.message);
-        } else {
-          this.games = response.data;
-          this.loaded = true;
-        }
-      }).catch(() => this.messagesService.error('error_unexpected'));
+      this.messagePromiseCatcher(this.gameService.getAll().then((games) => {
+        this.games = games;
+        this.loaded = true;
+      }));
     },
     deleteGame(gameId) {
-      this.gameService.delete(gameId).then((response) => {
-        if (response.data.status === 'ko') {
-          this.$store.commit('message/error', response.data.message);
-        } else {
-          this.load();
-        }
-      }).catch(() => this.messagesService.error('error_unexpected'));
+      this.messagePromiseCatcher(this.gameService.delete(gameId).then(() => {
+        this.load();
+      }));
     },
   },
 };

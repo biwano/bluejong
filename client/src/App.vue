@@ -16,7 +16,7 @@ export default {
   mixins: [AuthMixin],
   components: { navigation: Nav, messages: Messages },
   created() {
-    this.authGetUserInfo();
+    this.messagePromiseCatcher(this.authGetUserInfo());
   },
 };
 </script>

@@ -45,8 +45,8 @@ const mcrRulesSet = {
     else points = -8;
     return points;
   },
-  isFinished(handSlots) {
-    return handSlots.length === 16;
+  isFinished(game) {
+    return game.handSlots.length === 16;
   },
 };
 export default mcrRulesSet;

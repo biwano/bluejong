@@ -85,25 +85,17 @@ export default {
     // Saves modification to profile
     save() {
       if (this.dirty) {
-        this.authUpdateProfile({ name: this.name }).then((response) => {
-          if (response.data.status === 'ko') {
-            this.displayError(response.data.message);
-          } else {
-            this.displayInfo('profile_saved');
-            this.load();
-          }
-        }).catch(() => this.displayError('error_unexpected'));
+        this.messagePromiseCatcher(this.authUpdateProfile({ name: this.name }).then(() => {
+          this.displayInfo('profile_saved');
+          this.load();
+        }));
       }
     },
     anonymizeProfile() {
-      this.authAnonymizeProfile().then((response) => {
-        if (response.data.status === 'ko') {
-          this.displayError(response.data.message);
-        } else {
-          this.navigate({ name: 'Home' });
-          this.authGetUserInfo();
-        }
-      }).catch(() => this.displayError('error_unexpected'));
+      this.messagePromiseCatcher(this.authAnonymizeProfile().then(() => {
+        this.navigate({ name: 'Home' });
+        this.authGetUserInfo();
+      }));
     },
   },
   computed: {

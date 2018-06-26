@@ -29,19 +29,18 @@ router.post('/:id/rounds', async (req, res) => {
 });
 
 // Update game
-/*
 router.post('/:id', async (req, res) => {
   try {
-    let game = await res.M.Game.findOne({ ownerId: req.user._id, _id: req.params.id })
+    let tournament = await res.M.Tournament.findOne({ ownerId: req.user._id, _id: req.params.id })
       .populate('playerSlots.player').exec();
-    Object.assign(game, req.body);
-    game = await game.save();
-    res.sendData(game);
+    Object.assign(tournament, req.body);
+    tournament = await tournament.save();
+    res.sendData(tournament);
   } catch (err) {
     res.sendException(err);
   }
 });
-*/
+
 // Get tournament
 router.get('/:id', async (req, res) => {
   try {

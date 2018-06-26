@@ -21,7 +21,7 @@ router.post('/:id', async (req, res) => {
       .populate('playerSlots.player').exec();
     Object.assign(game, req.body);
     game = await game.save();
-    res.sendData(game);
+    res.sendDataVersion(game);
   } catch (err) {
     res.sendException(err);
   }

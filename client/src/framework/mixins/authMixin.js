@@ -18,15 +18,9 @@ export default {
   },
   methods: {
     authGetUserInfo() {
-      const request = http.get('auth');
-      request.then((response) => {
-        if (response.status !== 'ko') {
-          this.$store.commit('auth/authenticate', response.data);
-        }
-      }).catch(() => {
-        this.displayError('error_unexpected');
+      return http.get('auth').then((user) => {
+        this.$store.commit('auth/authenticate', user);
       });
-      return request;
     },
     authRequestRegistration(email) {
       return http.post('auth/request_registration', { email });

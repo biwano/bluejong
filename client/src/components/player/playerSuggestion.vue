@@ -33,10 +33,10 @@ export default {
     queryUpdated(query) {
       this.query = query;
       this.$emit('update:query', query);
-      this.playerService.find(query).then((response) => {
+      this.messagePromiseCatcher(this.playerService.find(query).then((players) => {
         this.suggestions = [];
-        for (let i = 0; i < response.data.length; i += 1) {
-          const player = response.data[i];
+        for (let i = 0; i < players.length; i += 1) {
+          const player = players[i];
           const suggestion = { id: player._id,
             display: player.name,
             value: player,
@@ -45,9 +45,7 @@ export default {
             this.suggestions.push(suggestion);
           }
         }
-      }).catch(() => {
-        this.displayError('error_unexpected');
-      });
+      }));
     },
     playerUpdated(player) {
       this.$emit('input', player);
@@ -57,14 +55,15 @@ export default {
       this.queryUpdated(this.query);
     },
     createPlayer(name) {
-      this.playerService.create(name).then((response) => {
-        const data = response.data;
-        if (data.status === 'ko' && data.message === 'player_exists') {
-          this.playerUpdated(data.payload);
-        } else this.playerUpdated(data);
+      this.playerService.create(name).then((data) => {
+        this.playerUpdated(data);
         this.$emit('blur');
-      }).catch(() => {
-        this.displayError('error_unexpected');
+      }).catch((data) => {
+        if (data.message === 'player_exists') {
+          this.playerUpdated(data.payload);
+        } else {
+          this.displayError(data.message);
+        }
       });
     },
 

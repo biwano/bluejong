@@ -23,7 +23,6 @@ export default {
   mixins: [GameMixin, TournamentMixin],
   data() {
     return {
-      loading: false,
     };
   },
   created() {
@@ -32,24 +31,15 @@ export default {
   },
   methods: {
     newGame(gameType) {
-      this.gameService.create(gameType).then((response) => {
-        if (response.data.status === 'ko') {
-          this.displayError(response.data.message);
-        } else {
-          this.$router.push({ name: 'Game', params: { id: response.data._id } });
-          this.loading = false;
-        }
-      }).catch(() => { this.loading = false; });
+      this.messagePromiseCatcher(this.gameService.create(gameType)).then((game) => {
+        this.$router.push({ name: 'Game', params: { id: game._id } });
+      });
     },
     newTournament(gameType) {
-      this.tournamentService.create(gameType).then((response) => {
-        if (response.data.status === 'ko') {
-          this.displayError(response.data.message);
-        } else {
-          this.$router.push({ name: 'Tournament', params: { id: response.data._id } });
-          this.loading = false;
-        }
-      }).catch(() => { this.loading = false; });
+      this.messagePromiseCatcher(this.tournamentService.create(gameType)).then((tournament) => {
+        this.$router.push({ name: 'Tournament',
+          params: { id: tournament._id, tab: 'configuration' } });
+      });
     },
   },
 };

@@ -1,6 +1,8 @@
 <template>
   <div class="uk-card uk-card-default uk-card-body">
-    <span class="uk-card-title">{{ L.sign_in }}</span><br/>
+    <div class="uk-margin">
+      <span class="uk-card-title">{{ L.sign_in }}</span><br/>
+    </div>
     <form>
       <div class="uk-margin">
         <input class="uk-input"
@@ -44,14 +46,10 @@ export default {
     // Sign in
     signIn() {
       if (this.validationStatus.valid) {
-        this.authSignIn(this.email, this.password).then((response) => {
-          if (response.data.status === 'ko') {
-            this.displayError(response.data.message);
-          } else {
-            this.authGetUserInfo();
-            this.navigate({ name: 'Home' });
-          }
-        }).catch(() => this.messagesService.error('error_unexpected'));
+        this.messagePromiseCatcher(this.authSignIn(this.email, this.password).then(() => {
+          this.authGetUserInfo();
+          this.navigate({ name: 'Home' });
+        }));
       }
     },
   },

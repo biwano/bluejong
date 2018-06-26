@@ -15,5 +15,15 @@ export default {
     displayError(text) {
       this.displayMessage('error', text);
     },
+    messagePromiseCatcher(promise) {
+      promise.catch((data) => {
+        let message = data.message;
+        if (data.payload !== undefined && data.payload.name === 'VersionError') {
+          message = 'error_concurrent_writes';
+        }
+        this.displayError(message);
+      });
+      return promise;
+    },
   },
 };

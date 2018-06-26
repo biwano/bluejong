@@ -4,12 +4,12 @@
     <table v-if="loaded" class="uk-table">
       <!-- Header -->
       <thead>
-        <tr>
+        <tr class="uk-table-middle">
           <th class="uk-text-center" v-if="ready">{{ L.wind }}</th>
           <th class="uk-text-center" v-if="ready">{{ L.winner }}</th>
           <th class="uk-text-center" v-if="ready">{{ L.picked_on }}</th>
           <th class="uk-text-center" v-if="ready">{{ L.points }}</th>
-          <th v-for="playerSlot in playerSlots" :key="playerSlot.index">
+          <th v-for="playerSlot in game.playerSlots" :key="playerSlot.index">
             <player-chooser
               v-model="playerSlot.player"
               @input="playerUpdated(playerSlot)"
@@ -22,30 +22,30 @@
       </thead>
       <!-- Hands -->
       <tbody>
-        <game-hand v-for="handSlot in handSlots" :key="handSlot.index"
-          :playerSlots="playerSlots"
+        <game-hand v-for="handSlot in game.handSlots" :key="handSlot.index"
+          :playerSlots="game.playerSlots"
           :hand="handSlot.hand" v-on:update:hand="handUpdated(handSlot, $event)"
           @validated="handValidated(handSlot, $event)"
           :ref="`hand${handSlot.index}`"
-          :rules="rules">
+          :rules="game.rules">
         </game-hand>
       </tbody>
       <!-- Penalty lines -->
-      <tbody :hidden="penaltySlots.length===0">
+      <tbody :hidden="game.penaltySlots.length===0">
         <tr>
           <th></th>
           <th class="uk-text-center" colspan="2">{{ L.offender }}</th>
           <th class="uk-text-center">{{ L.penalty }}</th>
-          <th v-for="playerSlot in playerSlots" :key="playerSlot.index">
+          <th v-for="playerSlot in game.playerSlots" :key="playerSlot.index">
             <span v-if="playerSlot.player">{{ playerSlot.player.name }}</span>
           </th>
         </tr>
-        <penalty-line v-for="penaltySlot in penaltySlots" :key="penaltySlot.index"
-          :playerSlots="playerSlots"
+        <penalty-line v-for="penaltySlot in game.penaltySlots" :key="penaltySlot.index"
+          :playerSlots="game.playerSlots"
           :penaltyLine="penaltySlot.penaltyLine"
           @update:penaltyLine="penaltyLineUpdated(penaltySlot, $event)"
           :ref="`penaltyLine${penaltySlot.index}`"
-          :rules="rules">
+          :rules="game.rules">
         </penalty-line>
       </tbody>
       <!-- Add Penalty -->
@@ -60,25 +60,27 @@
       </tbody>
       <!-- Totals -->
       <tbody v-if="ready">
+        <!-- Player list -->
         <tr>
           <th colspan="4"></th>
-          <th v-for="playerSlot in playerSlots" :key="playerSlot.index">
+          <th v-for="playerSlot in game.playerSlots" :key="playerSlot.index">
             <span v-if="playerSlot.player">{{ playerSlot.player.name }}</span>
           </th>
         </tr>
+        <!-- Scores -->
         <tr>
           <th colspan="4" class="uk-text-right">{{ L.totals }}</th>
-          <td v-for="playerSlot in playerSlots"
+          <td v-for="playerSlot in game.playerSlots"
             :key="playerSlot.index">
-            {{ totals[playerSlot.index] }}
+            {{ game.totals[playerSlot.index] }}
           </td>
         </tr>
         <!-- Table Points -->
         <tr>
           <th colspan="4" class="uk-text-right">{{ L.table_points }}</th>
-          <td v-for="playerSlot in playerSlots"
+          <td v-for="playerSlot in game.playerSlots"
               :key="playerSlot.index">
-            {{ tablePoints[playerSlot.index] }}
+            {{ game.tablePoints[playerSlot.index] }}
           </td>
         </tr>
       </tbody>
@@ -92,6 +94,7 @@ import '@/assets/east.png';
 import '@/assets/west.png';
 import '@/assets/north.png';
 import '@/assets/south.png';
+import debounce from 'lodash.debounce';
 import rulesSets from '@/business/rulesSets';
 import GameMixin from '@/mixins/gameMixin';
 import PlayerChooser from '../player/playerChooser';
@@ -104,15 +107,19 @@ export default {
   data() {
     return {
       // Players
-      playerSlots: [{ index: 0, player: undefined },
-        { index: 1, player: undefined },
-        { index: 2, player: undefined },
-        { index: 3, player: undefined }],
-      // Hands
-      handSlots: [],
-      penaltySlots: [],
-      // Table point distribution
-      rules: rulesSets.mcr,
+      game: {
+        playerSlots: [{ index: 0, player: undefined },
+          { index: 1, player: undefined },
+          { index: 2, player: undefined },
+          { index: 3, player: undefined }],
+        // Hands
+        handSlots: [],
+        penaltySlots: [],
+        // Table point distribution
+        rules: rulesSets.mcr,
+        totals: [0, 0, 0, 0],
+        tablePoints: [0, 0, 0, 0],
+      },
       loaded: false,
     };
   },
@@ -121,6 +128,7 @@ export default {
     next();
   },
   created() {
+    this.save = debounce(this.save, 500);
     this.load();
   },
 
@@ -128,54 +136,26 @@ export default {
     // Loads the game
     load() {
       this.game_id = this.$route.params.id;
-      this.gameService.get(this.game_id).then((response) => {
-        if (response.data.status === 'ko') {
-          this.displayError(response.data.message);
-        } else {
-          const game = response.data;
-          // Unpacking Rules
-          this.rules = rulesSets[game.rules];
-
-          // Unpacking players
-          for (let i = 0; i < this.playerSlots.length; i += 1) {
-            const playerSlot = this.playerSlots[i];
-            if (game.playerSlots !== undefined
-              && i < game.playerSlots.length
-              && game.playerSlots[i].player != null) {
-              playerSlot.player = game.playerSlots[i].player;
-            } else {
-              playerSlot.player = undefined;
-            }
-          }
-          // Unpacking Hands
-          this.handSlots = game.handSlots;
-          // Unpacking Hands
-          this.penaltySlots = game.penaltySlots;
-          this.loaded = true;
-        }
-      }).catch(() => this.displayError('error_unexpected'));
+      this.messagePromiseCatcher(this.gameService.get(this.game_id).then((game) => {
+        this.game = game;
+        this.loaded = true;
+      }));
     },
     // Saves the game
     save() {
       this.$nextTick(() => {
-        this.gameService.save(this.game_id, {
-          handSlots: this.handSlots,
-          playerSlots: this.playerSlots,
-          penaltySlots: this.penaltySlots,
-          totals: this.totals,
-          tablePoints: this.tablePoints,
-          status: this.status,
-        });
+        this.game.rules.updateGame(this.game);
+        this.messagePromiseCatcher(this.gameService.save(this.game_id, this.game));
       });
     },
     // A hand is updated, a new hand is created if this one is valid
     handUpdated(handSlot_, hand) {
       const handSlot = handSlot_;
       handSlot.hand = hand;
-      if (this.isLastHandSlot(handSlot) && this.rules.isValid(handSlot.hand)) {
-        const nextHand = this.rules.nextHandSlot(handSlot);
+      if (this.isLastHandSlot(handSlot) && this.game.rules.isValid(handSlot.hand)) {
+        const nextHand = this.game.rules.nextHandSlot(handSlot);
         if (nextHand !== undefined) {
-          this.handSlots.push(nextHand);
+          this.game.handSlots.push(nextHand);
         }
       }
       this.save();
@@ -189,14 +169,14 @@ export default {
     // A hand is validated (enter pressed => focus next hand)
     handValidated(handSlot) {
       if (!this.isLastHandSlot(handSlot)) {
-        this.focusHand(this.handSlots[handSlot.index + 1]);
+        this.focusHand(this.game.handSlots[handSlot.index + 1]);
       }
     },
     // Filters players already selected
     playerSuggestionFilter(playerSuggestion) {
       let res = true;
-      for (let i = 0; i < this.playerSlots.length; i += 1) {
-        const player = this.playerSlots[i].player;
+      for (let i = 0; i < this.game.playerSlots.length; i += 1) {
+        const player = this.game.playerSlots[i].player;
         if (player !== undefined && player._id === playerSuggestion.value._id) {
           res = false;
         }
@@ -205,7 +185,7 @@ export default {
     },
     // Is this the last handSlot?
     isLastHandSlot(handSlot) {
-      return handSlot.index === this.handSlots.length - 1;
+      return handSlot.index === this.game.handSlots.length - 1;
     },
     // A player was updated
     playerUpdated(playerSlot) {
@@ -215,9 +195,9 @@ export default {
     // Change focus when a player is updated
     focusPlayer(index) {
       // To the next undefined player
-      for (let i = 0; i < this.playerSlots.length; i += 1) {
+      for (let i = 0; i < this.game.playerSlots.length; i += 1) {
         if (i !== index) {
-          const playerSlot = this.playerSlots[i];
+          const playerSlot = this.game.playerSlots[i];
           if (playerSlot.player === undefined) {
             this.$refs[`chooser${playerSlot.index}`][0].editMode();
             return;
@@ -225,10 +205,10 @@ export default {
         }
       }
       // Creating first hand if it does not exists
-      if (this.handSlots.length === 0) {
-        this.handSlots.push(this.rules.nextHandSlot());
+      if (this.game.handSlots.length === 0) {
+        this.game.handSlots.push(this.game.rules.nextHandSlot());
       }
-      this.focusHand(this.handSlots[0]);
+      this.focusHand(this.game.handSlots[0]);
     },
     // Change focus to a hand
     focusHand(handSlot) {
@@ -236,42 +216,30 @@ export default {
     },
     // placeholder for player chooser
     playerChooserPlaceholder(playerSlot) {
-      return this.L[`select_player_${this.rules.WINDS[playerSlot.index]}`];
+      return this.L[`select_player_${this.game.rules.WINDS[playerSlot.index]}`];
     },
     // adds a pealty splot
     addPenalty() {
-      this.penaltySlots.push(this.rules.newPenaltySlot(this.lastPenaltySlot));
+      this.game.penaltySlots.push(this.game.rules.newPenaltySlot(this.lastPenaltySlot));
     },
   },
   computed: {
-    // Players' totals
-    totals() {
-      return this.rules.totals(this.playerSlots, this.handSlots, this.penaltySlots);
-    },
-    // Players' table points
-    tablePoints() {
-      return this.rules.tablePoints(this.playerSlots, this.handSlots, this.penaltySlots);
-    },
     // game ready if all players are filled
     ready() {
       let ready = true;
-      for (let i = 0; i < this.playerSlots.length; i += 1) {
-        if (this.playerSlots[i].player === undefined) ready = false;
+      for (let i = 0; i < this.game.playerSlots.length; i += 1) {
+        if (this.game.playerSlots[i].player === undefined) ready = false;
       }
       return ready;
     },
     // Last PenaltySlot
     lastPenaltySlot() {
-      return this.penaltySlots[this.penaltySlots.length - 1];
+      return this.game.penaltySlots[this.game.penaltySlots.length - 1];
     },
     // Can we add a new penalty
     penaltyReady() {
-      return this.ready && (this.penaltySlots.length === 0 ||
-        this.rules.isPenaltyLineValid(this.lastPenaltySlot.penaltyLine));
-    },
-    // game is finished?
-    status() {
-      return this.rules.isFinished(this.handSlots) ? 'ongoing' : 'finished';
+      return this.ready && (this.game.penaltySlots.length === 0 ||
+        this.game.rules.isPenaltyLineValid(this.lastPenaltySlot.penaltyLine));
     },
   },
   components: {

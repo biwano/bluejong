@@ -11,12 +11,12 @@
                 <icon url="#/home" icon="home" :size="1"></icon>
               </li>
           </ul>
-
-      </div>
-      <div class="uk-navbar-center">
         <ul class="uk-navbar-nav">
             <li><a href="#/home">{{ L.bluejong }}</a></li>
         </ul>
+
+      </div>
+      <div class="uk-navbar-center">
       </div>
       <div class="uk-navbar-right">
 
@@ -64,14 +64,10 @@ export default {
   },
   methods: {
     signOut() {
-      this.authSignOut().then((response) => {
-        if (response.data.status === 'ko') {
-          this.displayError(response.data.message);
-        } else {
-          this.authGetUserInfo();
-          this.navigate({ name: 'Home' });
-        }
-      }).catch(() => this.messagesService.error('error_unexpected'));
+      this.messagePromiseCatcher(this.authSignOut().then(() => {
+        this.authGetUserInfo();
+        this.navigate({ name: 'Home' });
+      }));
     },
   },
   computed: {

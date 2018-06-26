@@ -1,18 +1,16 @@
 <template>
   <div>
-    <ul uk-tab>
-      <li class="uk-active"><a href="#">Left</a></li>
-      <li><a>{{ L.tournament_configuration }}</a></li>
-      <li><a>{{ L.tournament_preparation }}</a></li>
-      <li class="uk-disabled"><a>Disabled</a></li>
-    </ul>
-    <tournament-config :tournament="tournament"></tournament-config>
+    <tabs :tabs='tabs' :value="tab" @input="switchTab($event)"></tabs>
+    <tournament-config :hidden="tab!=='configuration'"
+      :tournament="tournament"
+      @save="save('preparation')"></tournament-config>
   </div>
 </template>
 
 <script>
 import rulesSets from '@/business/rulesSets';
 import GameMixin from '@/mixins/gameMixin';
+import Tabs from '@/framework/components/tabs';
 import TournamentMixin from '@/mixins/tournamentMixin';
 import TournamentConfig from './tournamentConfig';
 import PlayerChooser from '../player/playerChooser';
@@ -22,12 +20,16 @@ export default {
   mixins: [GameMixin, TournamentMixin],
   data() {
     return {
+      tab: '',
+      tabs: [{ id: 'configuration', description: 'tournament_configuration' },
+        { id: 'preparation', description: 'tournament_preparation' },
+      ],
       tournament: {
-        nbPlayers: 0,
         nbRounds: 0,
+        nbTables: 0,
         teamsSize: 0,
         teamTournament: false,
-        RoundModel: 0,
+        roundModel: 0,
         playerSlots: [],
         roundSlots: [],
         rules: rulesSets.mcr,
@@ -36,53 +38,35 @@ export default {
     };
   },
   beforeRouteUpdate(to, from, next) {
-    this.load();
+    if (to.params.id !== from.params.id) {
+      this.load();
+    }
+    this.tab = to.params.tab;
     next();
   },
   created() {
     this.load();
+    this.tab = this.$route.params.tab;
   },
-
   methods: {
+    switchTab(tab) {
+      this.$router.push({ name: 'Tournament', params: { id: this.tournament._id, tab } });
+    },
     // Loads the game
     load() {
       this.tournament_id = this.$route.params.id;
-      this.tournamentService.get(this.tournament_id).then((response) => {
-        if (response.data.status === 'ko') {
-          this.displayError(response.data.message);
-        } else {
-          this.tournament = response.data;
-          // Unpacking Rules
-
-          // Unpacking players
-          /*
-          for (let i = 0; i < this.tournament.playerSlots.length; i += 1) {
-            const playerSlot = this.playerSlots[i];
-            if (tournament.playerSlots !== undefined
-              && i < tournament.playerSlots.length
-              && tournament.playerSlots[i].player != null) {
-              playerSlot.player = tournament.playerSlots[i].player;
-            } else {
-              playerSlot.player = undefined;
-            }
-          }
-          // Unpacking Hands
-          this.roundSlots = tournament.roundSlots;
-          this.loaded = true;
-          */
-        }
-      }).catch(() => this.displayError('error_unexpected'));
+      this.messagePromiseCatcher(
+        this.tournamentService.get(this.tournament_id).then((tournament) => {
+          this.tournament = tournament;
+        }));
     },
     // Saves the game
-    save() {
+    save(nextTab) {
       this.$nextTick(() => {
-        this.tournamenentService.save(this.tournament_id, {
-          roundSlots: this.handSlots,
-          playerSlots: this.playerSlots,
-          totals: this.totals,
-          tablePoints: this.tablePoints,
-          status: this.status,
-        });
+        this.messagePromiseCatcher(
+          this.tournamentService.save(this.tournament_id, this.tournament).then(() => {
+            this.switchTab(nextTab);
+          }));
       });
     },
     // A player was updated
@@ -130,6 +114,7 @@ export default {
   components: {
     'player-chooser': PlayerChooser,
     'tournament-config': TournamentConfig,
+    tabs: Tabs,
   },
 };
 </script>

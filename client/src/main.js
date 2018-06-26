@@ -14,7 +14,7 @@ import App from './App';
 import Suggestion from './framework/components/suggestion';
 import BooleanRadio from './framework/components/booleanRadio';
 import Icon from './framework/components/icon';
-import router from './router';
+import router from './router/routes';
 
 // loads the Icon plugin
 UIkit.use(Icons);

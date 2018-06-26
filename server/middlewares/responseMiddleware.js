@@ -26,6 +26,9 @@ router.use((req, res, next) => {
     res.Logger.debug(data);
     res.json(data);
   };
+  res.sendDataVersion = function sendDataVersion(data) {
+    res.json({ __v: data.__v });
+  };
   next();
 });
 

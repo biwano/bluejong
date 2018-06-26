@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr class="uk-table-middle">
     <!-- Wind -->
     <th>
       <img :src="windURL"/>

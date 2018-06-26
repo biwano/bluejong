@@ -1,15 +1,17 @@
 <template>
   <div :hidden="done" class="uk-card uk-card-default uk-card-body">
-    <span class="uk-card-title">{{ L.enter_email }}</span>
-      <input  class="uk-input"
-       data-validation-definition="validateEmail(email)"
-       :placeholder="L.email"
-       type="email" v-model="email" @keyup.enter="register()"/>
-      <button :disabled="!validationStatus.valid"
-        class="uk-button uk-button-primary button-submit"
-        @click="requestRegistration()">
-          {{ L.request_registration }}
-      </button>
+    <div class="uk-margin">
+      <span class="uk-card-title">{{ L.enter_email }}</span>
+    </div>
+    <input  class="uk-input"
+     data-validation-definition="validateEmail(email)"
+     :placeholder="L.email"
+     type="email" v-model="email" @keyup.enter="register()"/>
+    <button :disabled="!validationStatus.valid"
+      class="uk-button uk-button-primary button-submit"
+      @click="requestRegistration()">
+        {{ L.request_registration }}
+    </button>
 
   </div>
 </template>
@@ -31,14 +33,10 @@ export default {
     // Registers user
     requestRegistration() {
       if (this.validationStatus.valid) {
-        this.authRequestRegistration(this.email).then((response) => {
-          if (response.data.status === 'ko') {
-            this.displayError(response.data.message);
-          } else {
-            this.displayInfo('email_sent');
-            this.done = true;
-          }
-        }).catch(() => this.displayError('error_unexpected'));
+        this.messagePromiseCatcher(this.authRequestRegistration(this.email).then(() => {
+          this.displayInfo('email_sent');
+          this.done = true;
+        }));
       }
     },
   },

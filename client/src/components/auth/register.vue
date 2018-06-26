@@ -1,7 +1,9 @@
 <template>
   <div :hidden="tokenStatus!=='ok'" class="uk-card uk-card-default uk-card-body">
     <form>
-      <span class="uk-card-title">{{ L.registration_for }}</span><br/>
+      <div class="uk-margin">
+        <span class="uk-card-title">{{ L.registration_for }}</span><br/>
+      </div>
       <div class="uk-margin">
         <input  class="uk-input"
         autocomplete="username"
@@ -49,30 +51,21 @@ export default {
   },
   created() {
     const token = this.$route.params.token;
-    this.authCheckToken(token).then((response) => {
-      if (response.data.status === 'ko') {
-        this.displayError(response.data.message);
-        this.tokenStatus = 'ko';
-      } else {
-        this.email = response.data.login;
-        this.tokenStatus = 'ok';
-      }
-    }).catch(() => this.displayError('error_unexpected'));
+    this.messagePromiseCatcher(this.authCheckToken(token).then((data) => {
+      this.email = data.login;
+      this.tokenStatus = 'ok';
+    }));
   },
   methods: {
     // Registers user
     register() {
       if (this.validationStatus.valid) {
         const token = this.$route.params.token;
-        this.authRegister(token, this.password).then((response) => {
-          if (response.data.status === 'ko') {
-            this.displayError(response.data.message);
-          } else {
-            this.navigate({ name: 'SignIn' });
-            this.displayInfo('register_ok');
-            this.authGetUserInfo();
-          }
-        }).catch(() => this.displayError('error_unexpected'));
+        this.messagePromiseCatcher(this.authRegister(token, this.password).then(() => {
+          this.displayInfo('register_ok');
+          this.authGetUserInfo();
+          this.$router.push({ name: 'SignIn' });
+        }));
       }
     },
   },
