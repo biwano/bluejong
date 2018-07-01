@@ -20,7 +20,8 @@ export default new Router({
     { path: '/sign_in', name: 'SignIn', component: SignIn },
     { path: '/games', name: 'Games', component: Games },
     { path: '/game/:id', name: 'Game', component: Game },
-    { path: '/tournament/:id/:tab', name: 'Tournament', component: Tournament },
+    { path: '/tournament/:id', name: 'Tournament', component: Tournament },
+    { path: '/tournament/:id/:tab', name: 'TournamentTab', component: Tournament },
     { path: '/profile', name: 'Profile', component: Profile },
   ],
 });

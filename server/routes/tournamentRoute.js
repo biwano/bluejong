@@ -35,7 +35,7 @@ router.post('/:id', async (req, res) => {
       .populate('playerSlots.player').exec();
     Object.assign(tournament, req.body);
     tournament = await tournament.save();
-    res.sendData(tournament);
+    res.sendDataVersion(tournament);
   } catch (err) {
     res.sendException(err);
   }

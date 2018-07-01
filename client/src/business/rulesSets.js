@@ -7,6 +7,7 @@ const rulesSetBase = {
   MIN_MAHJONG_SCORE: 0,
   ROUND_DRAW: -2,
   PLAYER_NOT_CHOSEN: -1,
+  NB_PLAYERS: 4,
   // Is the player is the winner of the hand
   isWinner(hand, playerSlotIndex) {
     return hand.winnerIndex === playerSlotIndex;

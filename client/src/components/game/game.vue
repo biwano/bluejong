@@ -97,13 +97,14 @@ import '@/assets/south.png';
 import debounce from 'lodash.debounce';
 import rulesSets from '@/business/rulesSets';
 import GameMixin from '@/mixins/gameMixin';
+import PlayerMixin from '@/mixins/playerMixin';
 import PlayerChooser from '../player/playerChooser';
 import GameHand from './gameHand';
 import PenaltyLine from './penaltyLine';
 
 export default {
   name: 'Game',
-  mixins: [GameMixin],
+  mixins: [GameMixin, PlayerMixin],
   data() {
     return {
       // Players
@@ -174,14 +175,7 @@ export default {
     },
     // Filters players already selected
     playerSuggestionFilter(playerSuggestion) {
-      let res = true;
-      for (let i = 0; i < this.game.playerSlots.length; i += 1) {
-        const player = this.game.playerSlots[i].player;
-        if (player !== undefined && player._id === playerSuggestion.value._id) {
-          res = false;
-        }
-      }
-      return res;
+      return this.playerService.filterPlayer(playerSuggestion, this.game.playerSlots);
     },
     // Is this the last handSlot?
     isLastHandSlot(handSlot) {
@@ -193,22 +187,16 @@ export default {
       this.save();
     },
     // Change focus when a player is updated
-    focusPlayer(index) {
-      // To the next undefined player
-      for (let i = 0; i < this.game.playerSlots.length; i += 1) {
-        if (i !== index) {
-          const playerSlot = this.game.playerSlots[i];
-          if (playerSlot.player === undefined) {
-            this.$refs[`chooser${playerSlot.index}`][0].editMode();
-            return;
-          }
+    focusPlayer() {
+      // Focusing next player
+      if (!this.playerService.focusPlayerSlot(this.game.playerSlots, this.$refs, 'chooser')) {
+        // If no player to focus, creating first hand if it does not exists
+        if (this.game.handSlots.length === 0) {
+          this.game.handSlots.push(this.game.rules.nextHandSlot());
         }
+        // And focussing this hand
+        this.focusHand(this.game.handSlots[0]);
       }
-      // Creating first hand if it does not exists
-      if (this.game.handSlots.length === 0) {
-        this.game.handSlots.push(this.game.rules.nextHandSlot());
-      }
-      this.focusHand(this.game.handSlots[0]);
     },
     // Change focus to a hand
     focusHand(handSlot) {

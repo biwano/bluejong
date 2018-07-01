@@ -1,6 +1,6 @@
 <template>
 
-  <div>
+  <span >
     <!-- edit mode -->
     <span :hidden="mode!=='edit'">
           <player-suggestion v-model="player"
@@ -15,7 +15,7 @@
 
     </span>
     <!-- Read Mode -->
-    <div :hidden="mode!=='read'" class="uk-text-nowrap" @click="editMode()">
+    <span :hidden="mode!=='read'" class="uk-text-nowrap" @click="editMode()">
       <span class="uk-display-inline-block">
           <a v-if="player !== undefined">{{ player.name }}</a>
           <a v-if="player === undefined">{{ placeholder }}</a>
@@ -25,8 +25,8 @@
             uk-icon="icon: pencil"
             >
         </a>
-    </div>
-  </div>
+    </span>
+  </span>
 </template>
 
 <script>

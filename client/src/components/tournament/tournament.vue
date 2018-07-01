@@ -3,7 +3,13 @@
     <tabs :tabs='tabs' :value="tab" @input="switchTab($event)"></tabs>
     <tournament-config :hidden="tab!=='configuration'"
       :tournament="tournament"
-      @save="save('preparation')"></tournament-config>
+      @saved="switchTab('preparation')"></tournament-config>
+    <tournament-preparation :hidden="tab!=='preparation'"
+      :tournament="tournament"
+      @saved="switchTab('preparation')"></tournament-preparation>
+    <tournament-management :hidden="tab!=='management'"
+      :tournament="tournament"
+      @saved="switchTab('management')"></tournament-management>
   </div>
 </template>
 
@@ -11,8 +17,10 @@
 import rulesSets from '@/business/rulesSets';
 import GameMixin from '@/mixins/gameMixin';
 import Tabs from '@/framework/components/tabs';
-import TournamentMixin from '@/mixins/tournamentMixin';
+import { TournamentMixin, TournamentService } from '@/mixins/tournamentMixin';
 import TournamentConfig from './tournamentConfig';
+import TournamentPreparation from './tournamentPreparation';
+import TournamentManagement from './tournamentManagement';
 import PlayerChooser from '../player/playerChooser';
 
 export default {
@@ -21,9 +29,6 @@ export default {
   data() {
     return {
       tab: '',
-      tabs: [{ id: 'configuration', description: 'tournament_configuration' },
-        { id: 'preparation', description: 'tournament_preparation' },
-      ],
       tournament: {
         nbRounds: 0,
         nbTables: 0,
@@ -38,36 +43,49 @@ export default {
     };
   },
   beforeRouteUpdate(to, from, next) {
-    if (to.params.id !== from.params.id) {
-      this.load();
+    if (this !== undefined) {
+      if (to.params.id !== from.params.id) {
+        this.load();
+      }
+      this.tab = to.params.tab;
     }
-    this.tab = to.params.tab;
     next();
   },
-  created() {
+  beforeRouteEnter(to, from, next) {
+    const id = to.params.id;
+    // Redirect if called without tab parameter
+    if (to.params.tab === undefined) {
+      TournamentService.get(id).then((tournament) => {
+        const route = { name: 'TournamentTab',
+          params: { id, tab: TournamentService.tournamentTab(tournament) } };
+        next(route);
+      }).catch((e) => { console.error(e); });
+    } else next();
+  },
+  mounted() {
     this.load();
     this.tab = this.$route.params.tab;
   },
   methods: {
     switchTab(tab) {
-      this.$router.push({ name: 'Tournament', params: { id: this.tournament._id, tab } });
+      const route = { name: 'TournamentTab', params: { id: this.tournament._id, tab } };
+      this.$router.push(route);
+    },
+    // switch to the first tab authorizeb by the tournament status
+    autoTab() {
+      const tab = this.tournamentService
+        .getStatus(this.tournament.status)
+        .tabs[0];
+      this.switchTab(tab);
     },
     // Loads the game
     load() {
-      this.tournament_id = this.$route.params.id;
-      this.messagePromiseCatcher(
-        this.tournamentService.get(this.tournament_id).then((tournament) => {
-          this.tournament = tournament;
-        }));
-    },
-    // Saves the game
-    save(nextTab) {
-      this.$nextTick(() => {
-        this.messagePromiseCatcher(
-          this.tournamentService.save(this.tournament_id, this.tournament).then(() => {
-            this.switchTab(nextTab);
-          }));
-      });
+      const id = this.$route.params.id;
+      const __this = this;
+      this.messagePromiseCatcher(this.tournamentService.get(id).then((tournament) => {
+        this.tournament = tournament;
+        if (__this.tab === undefined || __this.tab.length === 0) __this.autoTab();
+      }));
     },
     // A player was updated
     playerUpdated(playerSlot) {
@@ -89,31 +107,15 @@ export default {
     },
   },
   computed: {
-    // Players' totals
-    /*
-    totals() {
-      return this.rules.totals(this.playerSlots, this.handSlots, this.penaltySlots);
+    tabs() {
+      return this.tournamentService.tabs(this.tournament.status);
     },
-    // Players' table points
-    tablePoints() {
-      return this.rules.tablePoints(this.playerSlots, this.handSlots, this.penaltySlots);
-    },
-    // game ready if all players are filled
-    ready() {
-      let ready = true;
-      for (let i = 0; i < this.playerSlots.length; i += 1) {
-        if (this.playerSlots[i].player === undefined) ready = false;
-      }
-      return ready;
-    },
-    // game is finished?
-    status() {
-      return this.rules.isFinished(this.handSlots) ? 'ongoing' : 'finished';
-    } */
   },
   components: {
     'player-chooser': PlayerChooser,
     'tournament-config': TournamentConfig,
+    'tournament-preparation': TournamentPreparation,
+    'tournament-management': TournamentManagement,
     tabs: Tabs,
   },
 };

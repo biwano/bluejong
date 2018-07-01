@@ -38,7 +38,7 @@ export default {
     newTournament(gameType) {
       this.messagePromiseCatcher(this.tournamentService.create(gameType)).then((tournament) => {
         this.$router.push({ name: 'Tournament',
-          params: { id: tournament._id, tab: 'configuration' } });
+          params: { id: tournament._id } });
       });
     },
   },

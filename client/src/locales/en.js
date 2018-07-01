@@ -65,8 +65,9 @@ export default {
   // Tournament
   new_tournament: 'New tournament',
   tournament_name: 'Tournament name',
-  tournament_configuration: 'Configuration',
-  tournament_preparation: 'Preparation',
+  tournament_configuration: 'Configure',
+  tournament_preparation: 'Prepare',
+  tournament_management: 'Manage',
   team_tournament: 'Team tournament',
   error_tournament_not_found: 'Tournament not found',
   number_of_tables: 'Number of tables',

@@ -1,7 +1,7 @@
 <template>
     <ul uk-tab>
       <li v-for="tab in tabs" :key="tab.id"
-        :class="{ active: tab.id === value, 'uk-active': tab.id === value }"
+        :class="tabClass(tab)"
         @click="selectTab(tab)">
         <a>{{ L[tab.description] }}</a>
       </li>
@@ -16,6 +16,12 @@ export default {
   methods: {
     selectTab(tab) {
       this.$emit('input', tab.id);
+    },
+    tabClass(tab) {
+      return { active: tab.id === this.value,
+        'uk-active': tab.id === this.value,
+        'uk-disabled': tab.disabled === true,
+      };
     },
   },
 };
