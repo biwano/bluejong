@@ -17,27 +17,33 @@ module.exports = {
   splitXPRT(xPRT) {
     const splited = xPRT.split(this.sep);
     return {
-      player: splited[1],
-      round: splited[2],
-      table: splited[3],
+      player: Number(splited[1]),
+      round: Number(splited[2]),
+      table: Number(splited[3]),
     };
   },
   // Creates round assignements from an xPRTs list
-  arrangementFromXPRTs(xPRTs) {
+  arrangementFromXPRTs(xPRTs, nbRounds, nbTables) {
     let rounds;
     if (xPRTs) {
-      rounds = {};
+      rounds = [];
+      for (let i = 0; i < nbRounds; i += 1) {
+        const round = { index: i, tables: [], status: 'management' };
+        rounds.push(round);
+        for (let j = 0; j < nbTables; j += 1) {
+          round.tables.push({ index: j, playerSlotIndexes: [] });
+        }
+      }
       const keys = Object.keys(xPRTs);
       for (let i = 0; i < keys.length; i += 1) {
         const key = keys[i];
         const value = xPRTs[key];
         if (value === true) {
           const xPRT = this.splitXPRT(key);
-          rounds[xPRT.round] = rounds[xPRT.round] || { tables: {} };
+          console.log(typeof (xPRT.round));
           const round = rounds[xPRT.round];
-          round.tables[xPRT.table] = round.tables[xPRT.table] || [];
           const table = round.tables[xPRT.table];
-          table.push(xPRT.player);
+          table.playerSlotIndexes.push(xPRT.player);
         }
       }
     }
@@ -170,7 +176,7 @@ module.exports = {
     // Returning arrangement or null if infeasible
     return new Promise((resolve) => {
       lpSolve.on('close', () => {
-        resolve(this.arrangementFromXPRTs(xPRTs));
+        resolve(this.arrangementFromXPRTs(xPRTs, rounds, tables));
       });
     });
   },
@@ -183,24 +189,24 @@ module.exports = {
   },
   // Distributes players randomly across tables and rounds
   solveBERandom(players, nbRounds) {
-    const rounds = {};
+    const rounds = [];
     for (let r = 0; r < nbRounds; r += 1) {
       const playersShuffled = players.slice(0);
       this.shuffleArray(playersShuffled);
-      let tableIndex = 0;
+      let t = 0;
       let table;
       // Round initialization
-      rounds[r] = { tables: {} };
+      rounds.push = { index: r, tables: [], status: 'management' };
       const round = rounds[r];
       for (let p = 0; p < players.length; p += 1) {
         // Table initialization
         if (p % 4 === 0) {
-          tableIndex = p / 4;
-          round.tables[tableIndex] = [];
-          table = round.tables[tableIndex];
+          t = p / 4;
+          round.tables[t] = { index: t, playerSlotIndexes: [] };
+          table = round.tables[t];
         }
         // Adding player to table
-        table.push(playersShuffled[p]);
+        table.push(playersShuffled[p].index);
       }
     }
     return rounds;

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="tournament" class="uk-card uk-card-default uk-card-body">
+  <div class="uk-margin-left uk-margin-right">
     <div class="uk-margin">
        <span class="uk-card-title">{{ L.players }}</span><br/>
     </div>
@@ -16,10 +16,25 @@
         </player-chooser>
       </div>
     </div>
+    <hr/>
+    <div>
+      <span>{{ L['round_model'] }}</span><br/>
+      <select class="uk-select"
+        v-model="tournament.roundModel"
+        data-validation-definition="validateRequired(tournament.roundModel)"
+          >
+        <option v-for="roundModel in roundModels"
+          :key="roundModel.name"
+          :value="roundModel"
+          @keyup.enter="save()">
+          {{ L[`round_model_${roundModel.name}`] }}
+        </option>
+      </select>
+    </div>
     <div class="uk-margin">
       <button :disabled="!ready"
         class="uk-button uk-button-primary" @click="save(true)">
-        {{ L.save }}
+        {{ L.tournament_start }}
       </button>
     </div>
 
@@ -48,11 +63,21 @@ export default {
       this.save();
     },
     save(done) {
-      if (done === true) this.tournament.status = 'management';
-      this.messagePromiseCatcher(
-        this.tournamentService.save(this.tournament._id, this.tournament).then(() => {
-          if (done === true) this.$emit('saved');
-        }));
+      let promise;
+      const id = this.tournament._id;
+      if (done === true) {
+        this.tournament.status = 'management';
+        promise = this.tournamentService.save(id, this.tournament)
+          .then(() => {
+            this.tournamentService.getRounds(id)
+              .then((rounds) => {
+                this.tournament.rounds = rounds;
+                this.tournamentService.save(id, this.tournament)
+                  .then(() => this.$emit('saved'));
+              });
+          });
+      } else promise = this.tournamentService.save(id, this.tournament);
+      this.messagePromiseCatcher(promise);
     },
     // Filters players already selected
     playerSuggestionFilter(playerSuggestion) {
@@ -67,7 +92,8 @@ export default {
       return this.tournament.playerSlots.filter(slot => slot.player !== undefined).length;
     },
     ready() {
-      return this.nbChosenPlayers === this.tournament.playerSlots.length;
+      return this.validationStatus.valid
+        && this.nbChosenPlayers === this.tournament.playerSlots.length;
     },
   },
 };

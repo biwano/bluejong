@@ -3,7 +3,7 @@
       <li v-for="tab in tabs" :key="tab.id"
         :class="tabClass(tab)"
         @click="selectTab(tab)">
-        <a>{{ L[tab.description] }}</a>
+        <a>{{ label(tab.description) }}</a>
       </li>
     </ul>
 </template>
@@ -22,6 +22,10 @@ export default {
         'uk-active': tab.id === this.value,
         'uk-disabled': tab.disabled === true,
       };
+    },
+    label(description) {
+      const l = this.L[description];
+      return l !== undefined ? l : description;
     },
   },
 };

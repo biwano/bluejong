@@ -1,126 +1,55 @@
 <template>
   <div>
-    <div v-if="!loaded" uk-spinner="ratio: 3"></div>
-    <table v-if="loaded" class="uk-table">
-      <!-- Header -->
-      <thead>
-        <tr class="uk-table-middle">
-          <th class="uk-text-center" v-if="ready">{{ L.wind }}</th>
-          <th class="uk-text-center" v-if="ready">{{ L.winner }}</th>
-          <th class="uk-text-center" v-if="ready">{{ L.picked_on }}</th>
-          <th class="uk-text-center" v-if="ready">{{ L.points }}</th>
-          <th v-for="playerSlot in game.playerSlots" :key="playerSlot.index">
+    <div>
+      <div v-if="!ready" class="uk-margin-left uk-margin-right">
+        <div class="uk-margin">
+           <span class="uk-card-title">{{ L.players }}</span><br/>
+        </div>
+        <div class="uk-child-width-1-4@s" uk-grid>
+          <div v-for="playerSlot in game.playerSlots"
+            :key="playerSlot.index">
             <player-chooser
               v-model="playerSlot.player"
               @input="playerUpdated(playerSlot)"
               :suggestionFilter="playerSuggestionFilter"
-              :placeholder="playerChooserPlaceholder(playerSlot)"
+              :placeholder="L.choose"
               :ref="`chooser${playerSlot.index}`">
             </player-chooser>
-          </th>
-        </tr>
-      </thead>
-      <!-- Hands -->
-      <tbody>
-        <game-hand v-for="handSlot in game.handSlots" :key="handSlot.index"
-          :playerSlots="game.playerSlots"
-          :hand="handSlot.hand" v-on:update:hand="handUpdated(handSlot, $event)"
-          @validated="handValidated(handSlot, $event)"
-          :ref="`hand${handSlot.index}`"
-          :rules="game.rules">
-        </game-hand>
-      </tbody>
-      <!-- Penalty lines -->
-      <tbody :hidden="game.penaltySlots.length===0">
-        <tr>
-          <th></th>
-          <th class="uk-text-center" colspan="2">{{ L.offender }}</th>
-          <th class="uk-text-center">{{ L.penalty }}</th>
-          <th v-for="playerSlot in game.playerSlots" :key="playerSlot.index">
-            <span v-if="playerSlot.player">{{ playerSlot.player.name }}</span>
-          </th>
-        </tr>
-        <penalty-line v-for="penaltySlot in game.penaltySlots" :key="penaltySlot.index"
-          :playerSlots="game.playerSlots"
-          :penaltyLine="penaltySlot.penaltyLine"
-          @update:penaltyLine="penaltyLineUpdated(penaltySlot, $event)"
-          :ref="`penaltyLine${penaltySlot.index}`"
-          :rules="game.rules">
-        </penalty-line>
-      </tbody>
-      <!-- Add Penalty -->
-      <tbody v-if="penaltyReady">
-        <tr>
-          <th colspan="8">
-            <button class="uk-button uk-button-primary" @click="addPenalty()">
-              {{ L.add_penalty }}
-            </button>
-          </th>
-        </tr>
-      </tbody>
-      <!-- Totals -->
-      <tbody v-if="ready">
-        <!-- Player list -->
-        <tr>
-          <th colspan="4"></th>
-          <th v-for="playerSlot in game.playerSlots" :key="playerSlot.index">
-            <span v-if="playerSlot.player">{{ playerSlot.player.name }}</span>
-          </th>
-        </tr>
-        <!-- Scores -->
-        <tr>
-          <th colspan="4" class="uk-text-right">{{ L.totals }}</th>
-          <td v-for="playerSlot in game.playerSlots"
-            :key="playerSlot.index">
-            {{ game.totals[playerSlot.index] }}
-          </td>
-        </tr>
-        <!-- Table Points -->
-        <tr>
-          <th colspan="4" class="uk-text-right">{{ L.table_points }}</th>
-          <td v-for="playerSlot in game.playerSlots"
-              :key="playerSlot.index">
-            {{ game.tablePoints[playerSlot.index] }}
-          </td>
-        </tr>
-      </tbody>
-
-    </table>
+          </div>
+        </div>
+      </div>
+      <div v-else>
+        <div class="uk-margin-left uk-margin-right">
+          <icon
+            icon="ban"
+            @click="reset()"
+            :confirm-click="true">
+          </icon>
+        </div>
+        <hr/>
+        <game-editor
+          v-model="game"
+          playerSlots="playerSlots"
+          @input="save()">
+        </game-editor>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import '@/assets/east.png';
-import '@/assets/west.png';
-import '@/assets/north.png';
-import '@/assets/south.png';
-import debounce from 'lodash.debounce';
-import rulesSets from '@/business/rulesSets';
-import GameMixin from '@/mixins/gameMixin';
+import { GameMixin, GameService } from '@/mixins/gameMixin';
 import PlayerMixin from '@/mixins/playerMixin';
 import PlayerChooser from '../player/playerChooser';
-import GameHand from './gameHand';
-import PenaltyLine from './penaltyLine';
+import GameEditor from './gameEditor';
 
 export default {
   name: 'Game',
   mixins: [GameMixin, PlayerMixin],
   data() {
     return {
-      // Players
-      game: {
-        playerSlots: [{ index: 0, player: undefined },
-          { index: 1, player: undefined },
-          { index: 2, player: undefined },
-          { index: 3, player: undefined }],
-        // Hands
-        handSlots: [],
-        penaltySlots: [],
-        // Table point distribution
-        rules: rulesSets.mcr,
-        totals: [0, 0, 0, 0],
-        tablePoints: [0, 0, 0, 0],
-      },
+      // Game
+      game: GameService.gameModel,
       loaded: false,
     };
   },
@@ -129,10 +58,8 @@ export default {
     next();
   },
   created() {
-    this.save = debounce(this.save, 500);
     this.load();
   },
-
   methods: {
     // Loads the game
     load() {
@@ -149,70 +76,23 @@ export default {
         this.messagePromiseCatcher(this.gameService.save(this.game_id, this.game));
       });
     },
-    // A hand is updated, a new hand is created if this one is valid
-    handUpdated(handSlot_, hand) {
-      const handSlot = handSlot_;
-      handSlot.hand = hand;
-      if (this.isLastHandSlot(handSlot) && this.game.rules.isValid(handSlot.hand)) {
-        const nextHand = this.game.rules.nextHandSlot(handSlot);
-        if (nextHand !== undefined) {
-          this.game.handSlots.push(nextHand);
-        }
-      }
+    playerUpdated() {
+      this.playerService.focusPlayerSlot(this.game.playerSlots, this.$refs, 'chooser');
       this.save();
-    },
-    // A penaltyLine is updated
-    penaltyLineUpdated(penaltySlot_, penaltyLine) {
-      const penaltySlot = penaltySlot_;
-      penaltySlot.penaltyLine = penaltyLine;
-      this.save();
-    },
-    // A hand is validated (enter pressed => focus next hand)
-    handValidated(handSlot) {
-      if (!this.isLastHandSlot(handSlot)) {
-        this.focusHand(this.game.handSlots[handSlot.index + 1]);
-      }
     },
     // Filters players already selected
     playerSuggestionFilter(playerSuggestion) {
       return this.playerService.filterPlayer(playerSuggestion, this.game.playerSlots);
     },
-    // Is this the last handSlot?
-    isLastHandSlot(handSlot) {
-      return handSlot.index === this.game.handSlots.length - 1;
-    },
-    // A player was updated
-    playerUpdated(playerSlot) {
-      this.focusPlayer(playerSlot.index);
-      this.save();
-    },
-    // Change focus when a player is updated
-    focusPlayer() {
-      // Focusing next player
-      if (!this.playerService.focusPlayerSlot(this.game.playerSlots, this.$refs, 'chooser')) {
-        // If no player to focus, creating first hand if it does not exists
-        if (this.game.handSlots.length === 0) {
-          this.game.handSlots.push(this.game.rules.nextHandSlot());
-        }
-        // And focussing this hand
-        this.focusHand(this.game.handSlots[0]);
+    // Reset all players
+    reset() {
+      for (let i = 0; i < this.game.playerSlots.length; i += 1) {
+        this.game.playerSlots[i].player = undefined;
       }
-    },
-    // Change focus to a hand
-    focusHand(handSlot) {
-      this.$nextTick(() => this.$refs[`hand${handSlot.index}`][0].focus());
-    },
-    // placeholder for player chooser
-    playerChooserPlaceholder(playerSlot) {
-      return this.L[`select_player_${this.game.rules.WINDS[playerSlot.index]}`];
-    },
-    // adds a pealty splot
-    addPenalty() {
-      this.game.penaltySlots.push(this.game.rules.newPenaltySlot(this.lastPenaltySlot));
     },
   },
   computed: {
-    // game ready if all players are filled
+    // Game ready if all players are filled
     ready() {
       let ready = true;
       for (let i = 0; i < this.game.playerSlots.length; i += 1) {
@@ -220,20 +100,10 @@ export default {
       }
       return ready;
     },
-    // Last PenaltySlot
-    lastPenaltySlot() {
-      return this.game.penaltySlots[this.game.penaltySlots.length - 1];
-    },
-    // Can we add a new penalty
-    penaltyReady() {
-      return this.ready && (this.game.penaltySlots.length === 0 ||
-        this.game.rules.isPenaltyLineValid(this.lastPenaltySlot.penaltyLine));
-    },
   },
   components: {
-    'game-hand': GameHand,
-    'penalty-line': PenaltyLine,
     'player-chooser': PlayerChooser,
+    'game-editor': GameEditor,
   },
 };
 </script>

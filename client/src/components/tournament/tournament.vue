@@ -1,16 +1,18 @@
 <template>
   <div>
     <tabs :tabs='tabs' :value="tab" @input="switchTab($event)"></tabs>
-    <tournament-config :hidden="tab!=='configuration'"
-      :tournament="tournament"
-      @saved="switchTab('preparation')"></tournament-config>
-    <tournament-preparation :hidden="tab!=='preparation'"
-      :tournament="tournament"
-      @saved="switchTab('preparation')"></tournament-preparation>
-    <tournament-management :hidden="tab!=='management'"
-      :tournament="tournament"
-      @saved="switchTab('management')"></tournament-management>
-  </div>
+    <div v-if="tournament">
+      <tournament-config :hidden="tab!=='configuration'"
+          :tournament="tournament"
+          @saved="switchTab('preparation')"></tournament-config>
+      <tournament-preparation :hidden="tab!=='preparation'"
+        :tournament="tournament"
+        @saved="switchTab('management')"></tournament-preparation>
+      <tournament-management :hidden="tab!=='management'"
+        :tournament="tournament"
+        @saved="switchTab('management')"></tournament-management>
+      </div>
+    </div>
 </template>
 
 <script>

@@ -68,12 +68,20 @@ export default {
   tournament_configuration: 'Configure',
   tournament_preparation: 'Prepare',
   tournament_management: 'Manage',
+  tournament_start: 'Start tournament',
   team_tournament: 'Team tournament',
   error_tournament_not_found: 'Tournament not found',
   number_of_tables: 'Number of tables',
   number_of_players: 'Number of players',
   number_of_rounds: 'Number of rounds',
   teams_size: 'Teams\' size',
+  // Round
+  round: 'Round',
+  rounds: 'Rounds',
+  configure_round: 'Configure round',
   round_model: 'Players\' distribution',
   round_model_min_encounters: 'Minimize encounters',
+  // Table
+  table: 'Table',
+  tables: 'Tables',
 };

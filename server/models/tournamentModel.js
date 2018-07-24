@@ -13,15 +13,17 @@ const schema = mongoose.Schema({
   rules: String,
   nbTables: { type: Number, default: 0 },
   nbRounds: { type: Number, default: 0 },
+  currentRound: { type: Number, default: 0 },
   name: String,
   playerSlots: [{ index: Number, player: { type: ObjectId, ref: 'Player' } }],
-  roundSlots: [{ index: Number,
-    round: {
-      tables: [{
-        index: Number,
-        playerSlotIndexes: [Number],
-      }],
-    },
+  rounds: [{
+    index: Number,
+    status: String,
+    tables: [{
+      index: Number,
+      game_id: { type: ObjectId, ref: 'Game' },
+      playerSlotIndexes: [Number],
+    }],
   }],
   totals: {},
   tablePoints: {},
@@ -31,13 +33,14 @@ schema.pre('save', function presave(next) {
   helpers.preSave(this);
   // Packing players before save
   helpers.packPlayers(this.playerSlots);
-  for (let i = 0; i < this.roundSlots.length; i += 1) {
-    const round = this.roundSlots[i];
+  /*
+  for (let i = 0; i < this.rounds.length; i += 1) {
+    const round = this.rounds[i];
     for (let j = 0; j < round.tables.length; j += 1) {
       const table = round.tables[j];
       helpers.packPlayers(table.playerSlots);
     }
-  }
+  } */
   next();
 });
 const Tournament = mongoose.model('Tournament', schema);

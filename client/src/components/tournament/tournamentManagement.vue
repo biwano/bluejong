@@ -1,70 +1,61 @@
 <template>
-  <div v-if="tournament" class="uk-card uk-card-default uk-card-body">
-    <div class="uk-margin">
-       <span class="uk-card-title">{{ L.players }}</span><br/>
-    </div>
-    <div class="uk-child-width-1-4@s" uk-grid>
-      <div v-for="playerSlot in tournament.playerSlots"
-        :key="playerSlot.index">
-        {{playerSlot.index + 1}}.&nbsp;
-        <player-chooser
-          v-model="playerSlot.player"
-          @input="playerUpdated(playerSlot)"
-          :suggestionFilter="playerSuggestionFilter"
-          :placeholder="L.choose"
-          :ref="`chooser${playerSlot.index}`">
-        </player-chooser>
-      </div>
-    </div>
-    <button :disabled="!ready"
-      class="uk-button uk-button-primary" @click="save(true)">
-      {{ L.save }}
-    </button>
-
+  <div v-if="round!==undefined">
+    <tabs :tabs='tabs' :value="currentRound" @input="switchTab($event)"></tabs>
+      <round-preparation v-if="round.status==='preparation'"
+        :tournament="tournament"
+        :round="round"></round-preparation>
+      <round-management v-if="round.status==='management'"
+        :tournament="tournament"
+        :round="round"></round-management>
   </div>
 </template>
 
 <script>
 import FormMixin from '@/framework/mixins/formMixin';
 import PlayerMixin from '@/mixins/playerMixin';
-import TournamentMixin from '@/mixins/tournamentMixin';
+import { TournamentMixin } from '@/mixins/tournamentMixin';
+import Tabs from '@/framework/components/tabs';
 import roundModels from '@/business/roundModels';
-import PlayerChooser from '@/components/player/playerChooser';
+import RoundPreparation from './roundPreparation';
+import RoundManagement from './roundManagement';
 
 export default {
-  name: 'TournamentPreparation',
+  name: 'TournamentManagement',
   mixins: [FormMixin, TournamentMixin, PlayerMixin],
   props: ['tournament'],
   data() {
     return {
+      currentRound: 0,
       roundModels,
     };
   },
   methods: {
-    playerUpdated() {
-      this.playerService.focusPlayerSlot(this.tournament.playerSlots, this.$refs, 'chooser');
-      this.save();
-    },
     save(done) {
       this.messagePromiseCatcher(
         this.tournamentService.save(this.tournament._id, this.tournament).then(() => {
           if (done === true) this.$emit('saved');
         }));
     },
-    // Filters players already selected
-    playerSuggestionFilter(playerSuggestion) {
-      return this.playerService.filterPlayer(playerSuggestion, this.tournament.playerSlots);
-    },
   },
   components: {
-    'player-chooser': PlayerChooser,
+    tabs: Tabs,
+    'round-preparation': RoundPreparation,
+    'round-management': RoundManagement,
   },
   computed: {
-    nbChosenPlayers() {
-      return this.tournament.playerSlots.filter(slot => slot.player !== undefined).length;
+    tabs() {
+      const tabs = [];
+      for (let i = 0; i < this.tournament.nbRounds; i += 1) {
+        const id = i;
+        const description = `${this.L.round} ${i + 1}`;
+        const disabled = this.tournament.currentRound < i;
+        tabs.push({ id, description, disabled });
+      }
+      return tabs;
     },
-    ready() {
-      return this.nbChosenPlayers === this.tournament.playerSlots.length;
+    round() {
+      return this.tournament.rounds !== undefined ?
+        this.tournament.rounds[this.currentRound] : undefined;
     },
   },
 };

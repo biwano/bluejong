@@ -15,7 +15,7 @@
 
 <script>
 import GameMixin from '@/mixins/gameMixin';
-import TournamentMixin from '@/mixins/tournamentMixin';
+import { TournamentMixin } from '@/mixins/tournamentMixin';
 import debounce from 'lodash.debounce';
 
 export default {

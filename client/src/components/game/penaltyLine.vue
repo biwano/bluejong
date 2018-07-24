@@ -16,7 +16,6 @@
             :value="playerSlot.index">
             <span>{{ playerName(playerSlot)}}</span>
           </option>
-          <option :value="this.rules.HAND_DRAW">{{ L.draw }}</option>
         </select>
       </th>
       <!-- Penalty -->

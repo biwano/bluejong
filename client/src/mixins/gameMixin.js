@@ -1,9 +1,23 @@
 import http from '@/framework/services/http';
 import rulesSets from '@/business/rulesSets';
 
-const gameService = {
+const GameService = {
   create(rules) {
-    return http.put('game', { rules, status: 'ongoing' });
+    const status = 'ongoing';
+    return http.put('game', { rules, status });
+  },
+  createForTournament(tournament, roundIndex, tableIndex) {
+    const playerSlots = [];
+    const round = tournament.rounds[roundIndex];
+    const table = round.tables[tableIndex];
+    for (let index = 0; index < tournament.rules.NB_PLAYERS; index += 1) {
+      const player = tournament.playerSlots[table.playerSlotIndexes[index]].player;
+      playerSlots.push({ index, player });
+    }
+    const status = 'ongoing';
+    const tournamentId = tournament._id;
+    const rules = tournament.rules.name;
+    return http.put('game', { rules, status, tournamentId, tableIndex, roundIndex });
   },
   get(id) {
     return new Promise((resolve, reject) => http.get(`game/${id}`).then((game_) => {
@@ -31,10 +45,26 @@ const gameService = {
   getAll() {
     return http.get('game');
   },
-};
-
-export default {
-  created() {
-    this.gameService = gameService;
+  gameModel: {
+    playerSlots: [{ index: 0, player: undefined },
+      { index: 1, player: undefined },
+      { index: 2, player: undefined },
+      { index: 3, player: undefined }],
+    // Hands
+    handSlots: [],
+    penaltySlots: [],
+    // Table point distribution
+    rules: rulesSets.mcr,
+    totals: [0, 0, 0, 0],
+    tablePoints: [0, 0, 0, 0],
   },
 };
+const GameMixin = {
+  created() {
+    this.gameService = GameService;
+  },
+};
+
+export { GameMixin, GameService };
+
+export default GameMixin;

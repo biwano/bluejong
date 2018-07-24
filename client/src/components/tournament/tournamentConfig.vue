@@ -1,5 +1,5 @@
 <template>
-  <div v-if="tournament" class="uk-card uk-card-default uk-card-body">
+  <div @keyup.enter="save()" class="uk-margin-left uk-margin-right">
     <div  class="uk-margin">
       <span>{{ L.tournament_name }}</span><br/>
       <input  type="text"
@@ -7,7 +7,7 @@
         v-model="tournament.name"
         data-validation-definition="validateRequired(tournament.name)"
         :placeholder="L.tournament_name"
-        @keyup.enter="save()"/>
+        />
         {{ getValidationError('tournament') }}
     </div>
 
@@ -18,7 +18,7 @@
             class='uk-input'
             v-model="tournament.nbTables"
             :placeholder="L.number_of_players"
-            @keyup.enter="save()" />
+             />
       </div>
       <div>
           <span>{{ L.number_of_rounds }}</span><br/>
@@ -27,7 +27,7 @@
             v-model="tournament.nbRounds"
             data-validation-definition="validatePositive(tournament.nbRounds)"
             :placeholder="L.number_of_rounds"
-            @keyup.enter="save()"/>
+            />
       </div>
       <!--
       <div>
@@ -47,22 +47,7 @@
           </div>
       </div>
     -->
-      <!--
-      <div>
-        <span>{{ L['round_model'] }}</span><br/>
-        <select class="uk-select"
-          v-model="tournament.roundModel"
-          data-validation-definition="validateRequired(tournament.roundModel)"
-            >
-          <option v-for="roundModel in roundModels"
-            :key="roundModel.name"
-            :value="roundModel"
-            @keyup.enter="save()">
-            {{ L[`round_model_${roundModel.name}`] }}
-          </option>
-        </select>
-      </div>
-    -->
+
     </div>
     <div>
       <br/>
@@ -93,6 +78,7 @@ export default {
       if (this.validationStatus.valid) {
         this.$nextTick(() => {
           this.tournamentService.adjustPlayers(this.tournament);
+          this.tournamentService.adjustRounds(this.tournament);
           this.tournament.status = 'preparation';
           this.messagePromiseCatcher(
             this.tournamentService.save(this.tournament._id, this.tournament).then(() => {

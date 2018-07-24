@@ -124,6 +124,9 @@ const rulesSetBase = {
     game.tablePoints = this.tablePoints(game);
     game.totals = this.totals(game);
   },
+  playerWind(playerSlot) {
+    return this.WINDS[playerSlot.index];
+  },
 };
 const rulesSets = {};
 const appendRulesSet = function appendRulesSet(rule) {

@@ -14,7 +14,7 @@ const TournamentService = {
     },
     { id: 'management',
       description: 'tournament_management',
-      tabs: ['preparation', 'management'],
+      tabs: ['configuration', 'preparation', 'management'],
     },
   ],
   create(rules) {
@@ -46,6 +46,12 @@ const TournamentService = {
     // saving
     return http.updateHandler(http.post(`tournament/${id}`, tournament), tournament_);
   },
+  getRounds(id) {
+    return http.get(`tournament/${id}/rounds`);
+  },
+  getGame(id, roundIndex, tableIndex) {
+    return http.get(`tournament/${id}/round/${roundIndex}/table/${tableIndex}`);
+  },
   /*
   delete(id) {
     return http.delete(`game/${id}`);
@@ -65,6 +71,19 @@ const TournamentService = {
     while (tournament.playerSlots.length < nbPlayers) {
       tournament.playerSlots.push({ index: tournament.playerSlots.length,
         player: undefined });
+    }
+  },
+  adjustRounds(tournament_) {
+    // Ajusting number of players
+    const tournament = tournament_;
+    const nbRounds = tournament.nbRounds;
+
+    if (tournament.rounds.length > nbRounds) {
+      tournament.rounds.splice(nbRounds);
+    }
+    while (tournament.rounds.length < nbRounds) {
+      tournament.rounds.push({ index: tournament.rounds.length,
+        round: { tables: [] } });
     }
   },
   // Retourne une configuration d'onglet adéquate pour tab
